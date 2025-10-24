@@ -50,7 +50,7 @@ const Index = () => {
       }
       
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(validatedCity)}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(validatedCity)}&appid=${&appid=f395d91f1589f0b9aa6128ddb040fc14}`
       );
       
       const data = await response.json();
