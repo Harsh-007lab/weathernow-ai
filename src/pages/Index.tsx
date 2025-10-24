@@ -27,9 +27,20 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      const API_KEY = "f395d91f1589f0b9aa6128ddb040fc14";
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      
+      if (!API_KEY) {
+        toast({
+          title: "Configuration Error",
+          description: "Weather API key is not configured. Please contact support.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}`
       );
       
       const data = await response.json();
