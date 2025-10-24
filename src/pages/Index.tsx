@@ -1,9 +1,16 @@
 import { useState } from "react";
+import { z } from "zod";
 import { WeatherBackground } from "@/components/WeatherBackground";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin } from "lucide-react";
+
+const citySchema = z.string()
+  .trim()
+  .min(1, "City name is required")
+  .max(100, "City name is too long")
+  .regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
 
 interface WeatherData {
   city: string;
@@ -27,6 +34,9 @@ const Index = () => {
     setIsLoading(true);
     
     try {
+      // Validate city input
+      const validatedCity = citySchema.parse(city);
+      
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
       
       if (!API_KEY) {
@@ -40,7 +50,7 @@ const Index = () => {
       }
       
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(validatedCity)}&appid=${API_KEY}`
       );
       
       const data = await response.json();
@@ -87,11 +97,20 @@ const Index = () => {
         description: `Showing weather for ${data.name}, ${data.sys.country}`,
       });
     } catch (error) {
-      toast({
-        title: "Network error",
-        description: "Please check your connection and try again.",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Invalid city name",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        console.error('Weather fetch error:', error);
+        toast({
+          title: "Network error",
+          description: "Please check your connection and try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

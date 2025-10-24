@@ -27,6 +27,7 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
           placeholder="Search for a city..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          maxLength={100}
           className="flex-1 bg-transparent border-0 text-white placeholder:text-white/50 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
           disabled={isLoading}
         />
