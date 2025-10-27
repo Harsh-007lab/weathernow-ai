@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { z } from "zod";
 import { WeatherBackground } from "@/components/WeatherBackground";
+import { WeatherParticles } from "@/components/WeatherParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
+import { WeatherInsights } from "@/components/WeatherInsights";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin } from "lucide-react";
 
@@ -120,12 +122,15 @@ const Index = () => {
         isDaytime={isDaytime()}
       />
       
+      {/* Weather Particles */}
+      {weatherData && <WeatherParticles condition={weatherData.condition} />}
+      
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <MapPin className="w-10 h-10 text-white drop-shadow-lg" />
+          <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
+            <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
             <h1 className="text-6xl md:text-7xl font-bold text-white text-shadow-strong">
               WeatherNow
             </h1>
@@ -140,20 +145,28 @@ const Index = () => {
 
         {/* Weather Display */}
         {weatherData && !isLoading && (
-          <WeatherCard data={weatherData} />
+          <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+            <WeatherCard data={weatherData} />
+            <WeatherInsights 
+              temp={weatherData.temp}
+              condition={weatherData.condition}
+              humidity={weatherData.humidity}
+              windSpeed={weatherData.windSpeed}
+            />
+          </div>
         )}
 
         {/* Initial State */}
         {!weatherData && !isLoading && (
-          <div className="glass rounded-3xl p-12 text-center animate-scale-in">
-            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6">
+          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale">
+            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
               <MapPin className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">
               Discover Weather Anywhere
             </h3>
             <p className="text-white/70 max-w-md">
-              Enter any city name to see current weather conditions with stunning visuals
+              Enter any city name to see current weather conditions with stunning visuals and AI-powered insights
             </p>
           </div>
         )}
@@ -161,8 +174,8 @@ const Index = () => {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center z-10">
-        <p className="text-white/50 text-sm">
-          Powered by OpenWeatherMap API
+        <p className="text-white/50 text-sm hover:text-white/70 transition-colors">
+          Powered by OpenWeatherMap API & Lovable AI
         </p>
       </div>
     </div>
