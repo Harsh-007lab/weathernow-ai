@@ -37,17 +37,7 @@ const Index = () => {
       // Validate city input
       const validatedCity = citySchema.parse(city);
       
-      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      
-      if (!API_KEY) {
-        toast({
-          title: "Configuration Error",
-          description: "Weather API key is not configured. Please contact support.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "f395d91f1589f0b9aa6128ddb040fc14";
       
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(validatedCity)}&appid=${API_KEY}&units=metric`
@@ -83,9 +73,9 @@ const Index = () => {
         city: data.name,
         country: data.sys.country,
         condition: data.weather[0].main,
-        temp: Math.round(data.main.temp - 273.15),
-        minTemp: Math.round(data.main.temp_min - 273.15),
-        maxTemp: Math.round(data.main.temp_max - 273.15),
+        temp: Math.round(data.main.temp),
+        minTemp: Math.round(data.main.temp_min),
+        maxTemp: Math.round(data.main.temp_max),
         humidity: data.main.humidity,
         windSpeed: Math.round(data.wind.speed * 10) / 10,
         sunrise: formatTime(sunriseLocal),
