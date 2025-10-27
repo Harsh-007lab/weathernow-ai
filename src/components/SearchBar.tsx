@@ -1,7 +1,15 @@
-import { useState } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Search, Loader2, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+interface CityOption {
+  name: string;
+  state?: string;
+  country: string;
+  lat: number;
+  lon: number;
+}
 
 interface SearchBarProps {
   onSearch: (city: string) => void;
@@ -10,16 +18,72 @@ interface SearchBarProps {
 
 export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
   const [city, setCity] = useState("");
+  const [suggestions, setSuggestions] = useState<CityOption[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const searchRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (city.trim().length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setIsLoadingSuggestions(true);
+      try {
+        const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "f395d91f1589f0b9aa6128ddb040fc14";
+        const response = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city.trim())}&limit=5&appid=${API_KEY}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          setSuggestions(data);
+          setShowSuggestions(data.length > 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch suggestions:", error);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timeoutId);
+  }, [city]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (city.trim()) {
       onSearch(city.trim());
+      setShowSuggestions(false);
     }
   };
 
+  const handleSelectSuggestion = (suggestion: CityOption) => {
+    const cityName = suggestion.state 
+      ? `${suggestion.name}, ${suggestion.state}, ${suggestion.country}`
+      : `${suggestion.name}, ${suggestion.country}`;
+    setCity(cityName);
+    setShowSuggestions(false);
+    onSearch(cityName);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down relative" ref={searchRef}>
       <div className="glass-strong rounded-2xl p-2 flex items-center gap-2">
         <Search className="w-6 h-6 text-white/60 ml-4" />
         <Input
@@ -27,9 +91,11 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
           placeholder="Search for a city..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
           maxLength={100}
           className="flex-1 bg-transparent border-0 text-white placeholder:text-white/50 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
           disabled={isLoading}
+          autoComplete="off"
         />
         <Button
           type="submit"
@@ -46,6 +112,36 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
           )}
         </Button>
       </div>
+
+      {/* Suggestions Dropdown */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 glass-strong rounded-xl overflow-hidden shadow-2xl z-50 backdrop-blur-md border border-white/20">
+          {isLoadingSuggestions ? (
+            <div className="p-4 text-center text-white/60">
+              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+            </div>
+          ) : (
+            <ul className="py-2">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={`${suggestion.lat}-${suggestion.lon}-${index}`}
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                  className="px-4 py-3 hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3 text-white"
+                >
+                  <MapPin className="w-4 h-4 text-white/60 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {suggestion.name}
+                      {suggestion.state && `, ${suggestion.state}`}
+                    </div>
+                    <div className="text-sm text-white/60">{suggestion.country}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </form>
   );
 };
