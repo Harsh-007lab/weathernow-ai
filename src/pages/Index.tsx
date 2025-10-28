@@ -8,12 +8,15 @@ import { WeatherInsights } from "@/components/WeatherInsights";
 import { ForecastCard } from "@/components/ForecastCard";
 import { WeatherMetrics } from "@/components/WeatherMetrics";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AIChat } from "@/components/AIChat";
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
-import { MapPin, Loader2, Navigation } from "lucide-react";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 const citySchema = z.string()
   .trim()
@@ -31,6 +34,9 @@ const Index = () => {
   // Weather data hooks
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity, !!selectedCity);
   const { data: forecastData, isLoading: forecastLoading } = useForecast(selectedCity, !!selectedCity);
+  
+  // Auto-refresh every 15 minutes
+  const { manualRefresh } = useAutoRefresh(15, !!weatherData);
 
   const handleSearch = async (city: string) => {
     try {
@@ -94,12 +100,26 @@ const Index = () => {
       
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
-        {/* Header with Theme Toggle */}
-        <div className="absolute top-4 right-4">
+        {/* Header with Theme Toggle and Refresh */}
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <Button
+            onClick={manualRefresh}
+            variant="ghost"
+            size="icon"
+            className="glass hover:bg-white/20 border-0"
+            disabled={!weatherData}
+          >
+            <RefreshCw className="h-5 w-5 text-white" />
+          </Button>
           <ThemeToggle />
         </div>
 
-        <div className="text-center mb-12 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
           <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
             <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
             <h1 className="text-6xl md:text-7xl font-bold text-white text-shadow-strong">
@@ -109,10 +129,15 @@ const Index = () => {
           <p className="text-white/80 text-xl text-shadow-soft">
             AI-powered weather insights & forecasts
           </p>
-        </div>
+        </motion.div>
 
         {/* Search with Location Button */}
-        <div className="flex items-center gap-3 w-full max-w-2xl mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex items-center gap-3 w-full max-w-2xl mb-8"
+        >
           <div className="flex-1">
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
@@ -128,7 +153,7 @@ const Index = () => {
               <Navigation className="w-5 h-5 text-white" />
             )}
           </Button>
-        </div>
+        </motion.div>
 
         {/* Loading Skeletons */}
         {isLoading && (
@@ -141,7 +166,12 @@ const Index = () => {
 
         {/* Weather Display */}
         {weatherData && !isLoading && (
-          <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-4xl space-y-6"
+          >
             <WeatherCard data={weatherData} />
             <WeatherMetrics data={weatherData} />
             {forecastData && <ForecastCard forecast={forecastData.daily} />}
@@ -151,7 +181,7 @@ const Index = () => {
               humidity={weatherData.humidity}
               windSpeed={weatherData.windSpeed}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Initial State */}
@@ -169,6 +199,9 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {/* AI Chat Assistant */}
+      <AIChat weatherData={weatherData} />
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center z-10">
