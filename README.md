@@ -161,7 +161,3 @@ MIT License - feel free to use this project for learning or commercial purposes.
 - Lovable AI for intelligent insights
 - Radix UI & shadcn/ui for beautiful components
 - Framer Motion for smooth animations
-
----
-
-Built with ❤️ using [Lovable](https://lovable.dev)
