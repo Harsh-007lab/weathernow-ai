@@ -5,8 +5,15 @@ import { WeatherParticles } from "@/components/WeatherParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
 import { WeatherInsights } from "@/components/WeatherInsights";
+import { ForecastCard } from "@/components/ForecastCard";
+import { WeatherMetrics } from "@/components/WeatherMetrics";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin } from "lucide-react";
+import { useWeather, useForecast } from "@/hooks/useWeather";
+import { useGeoLocation } from "@/hooks/useGeoLocation";
+import { MapPin, Loader2, Navigation } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const citySchema = z.string()
   .trim()
@@ -14,79 +21,24 @@ const citySchema = z.string()
   .max(100, "City name is too long")
   .regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
 
-interface WeatherData {
-  city: string;
-  country: string;
-  condition: string;
-  temp: number;
-  minTemp: number;
-  maxTemp: number;
-  humidity: number;
-  windSpeed: number;
-  sunrise: string;
-  sunset: string;
-}
-
 const Index = () => {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  // Geolocation hook
+  const { location, loading: geoLoading, error: geoError, fetchLocation } = useGeoLocation(false);
+  
+  // Weather data hooks
+  const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity, !!selectedCity);
+  const { data: forecastData, isLoading: forecastLoading } = useForecast(selectedCity, !!selectedCity);
 
-  const fetchWeather = async (city: string) => {
-    setIsLoading(true);
-    
+  const handleSearch = async (city: string) => {
     try {
-      // Validate city input
-      const validatedCity = citySchema.parse(city);
-      
-      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "f395d91f1589f0b9aa6128ddb040fc14";
-      
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(validatedCity)}&appid=${API_KEY}&units=metric`
-      );
-      
-      const data = await response.json();
-      
-      if (data.cod !== 200) {
-        toast({
-          title: "City not found",
-          description: "Please check the city name and try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Process the data
-      const timezoneOffset = data.timezone || 0;
-      const sunriseLocal = data.sys.sunrise + timezoneOffset;
-      const sunsetLocal = data.sys.sunset + timezoneOffset;
-      
-      const formatTime = (timestamp: number) => {
-        const date = new Date(timestamp * 1000);
-        return date.toLocaleTimeString("en-US", { 
-          hour: "2-digit", 
-          minute: "2-digit",
-          hour12: true 
-        });
-      };
-
-      setWeatherData({
-        city: data.name,
-        country: data.sys.country,
-        condition: data.weather[0].main,
-        temp: Math.round(data.main.temp),
-        minTemp: Math.round(data.main.temp_min),
-        maxTemp: Math.round(data.main.temp_max),
-        humidity: data.main.humidity,
-        windSpeed: Math.round(data.wind.speed * 10) / 10,
-        sunrise: formatTime(sunriseLocal),
-        sunset: formatTime(sunsetLocal),
-      });
-
+      citySchema.parse(city);
+      setSelectedCity(city);
       toast({
-        title: "Weather loaded!",
-        description: `Showing weather for ${data.name}, ${data.sys.country}`,
+        title: "Loading weather...",
+        description: `Fetching data for ${city}`,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -95,18 +47,33 @@ const Index = () => {
           description: error.errors[0].message,
           variant: "destructive",
         });
-      } else {
-        console.error('Weather fetch error:', error);
-        toast({
-          title: "Network error",
-          description: "Please check your connection and try again.",
-          variant: "destructive",
-        });
       }
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  const handleLocationClick = () => {
+    fetchLocation();
+  };
+
+  // Show error toast when geo location fails
+  if (geoError) {
+    toast({
+      title: "Location Error",
+      description: geoError,
+      variant: "destructive",
+    });
+  }
+
+  // Show error toast when weather fetch fails
+  if (weatherError) {
+    toast({
+      title: "Weather Error",
+      description: "Failed to fetch weather data. Please try again.",
+      variant: "destructive",
+    });
+  }
+
+  const isLoading = weatherLoading || forecastLoading;
 
   const isDaytime = () => {
     if (!weatherData) return true;
@@ -127,7 +94,11 @@ const Index = () => {
       
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
-        {/* Header */}
+        {/* Header with Theme Toggle */}
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+
         <div className="text-center mb-12 animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
             <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
@@ -136,17 +107,44 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-white/80 text-xl text-shadow-soft">
-            Beautiful weather, beautiful design
+            AI-powered weather insights & forecasts
           </p>
         </div>
 
-        {/* Search */}
-        <SearchBar onSearch={fetchWeather} isLoading={isLoading} />
+        {/* Search with Location Button */}
+        <div className="flex items-center gap-3 w-full max-w-2xl mb-8">
+          <div className="flex-1">
+            <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+          </div>
+          <Button
+            onClick={handleLocationClick}
+            disabled={geoLoading}
+            className="glass hover:bg-white/20 border-0 h-14 px-4"
+            size="icon"
+          >
+            {geoLoading ? (
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
+            ) : (
+              <Navigation className="w-5 h-5 text-white" />
+            )}
+          </Button>
+        </div>
+
+        {/* Loading Skeletons */}
+        {isLoading && (
+          <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+            <Skeleton className="w-full h-64 rounded-3xl glass" />
+            <Skeleton className="w-full h-48 rounded-3xl glass" />
+            <Skeleton className="w-full h-96 rounded-3xl glass" />
+          </div>
+        )}
 
         {/* Weather Display */}
         {weatherData && !isLoading && (
           <div className="w-full max-w-4xl space-y-6 animate-fade-in">
             <WeatherCard data={weatherData} />
+            <WeatherMetrics data={weatherData} />
+            {forecastData && <ForecastCard forecast={forecastData.daily} />}
             <WeatherInsights 
               temp={weatherData.temp}
               condition={weatherData.condition}
@@ -158,7 +156,7 @@ const Index = () => {
 
         {/* Initial State */}
         {!weatherData && !isLoading && (
-          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale">
+          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
               <MapPin className="w-10 h-10 text-white" />
             </div>
@@ -166,7 +164,7 @@ const Index = () => {
               Discover Weather Anywhere
             </h3>
             <p className="text-white/70 max-w-md">
-              Enter any city name to see current weather conditions with stunning visuals and AI-powered insights
+              Search for any city or use your current location to see weather conditions with AI-powered insights and 5-day forecasts
             </p>
           </div>
         )}
