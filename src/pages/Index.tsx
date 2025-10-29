@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { WeatherBackground } from "@/components/WeatherBackground";
 import { WeatherParticles } from "@/components/WeatherParticles";
@@ -10,7 +10,7 @@ import { WeatherMetrics } from "@/components/WeatherMetrics";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AIChat } from "@/components/AIChat";
 import { useToast } from "@/hooks/use-toast";
-import { useWeather, useForecast } from "@/hooks/useWeather";
+import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
@@ -43,10 +43,20 @@ const Index = () => {
     isLoading: forecastLoading
   } = useForecast(selectedCity, !!selectedCity);
 
+  // Weather by coordinates hook
+  const { data: weatherByCoords } = useWeatherByCoords(
+    location?.latitude ?? null,
+    location?.longitude ?? null,
+    !!location
+  );
+
+  // Use weatherByCoords if available, otherwise use city-based weather
+  const displayWeatherData = weatherByCoords || weatherData;
+
   // Auto-refresh every 15 minutes
   const {
     manualRefresh
-  } = useAutoRefresh(15, !!weatherData);
+  } = useAutoRefresh(15, !!displayWeatherData);
   const handleSearch = async (city: string) => {
     try {
       citySchema.parse(city);
@@ -70,40 +80,45 @@ const Index = () => {
   };
 
   // Show error toast when geo location fails
-  if (geoError) {
-    toast({
-      title: "Location Error",
-      description: geoError,
-      variant: "destructive"
-    });
-  }
+  useEffect(() => {
+    if (geoError) {
+      toast({
+        title: "Location Error",
+        description: geoError,
+        variant: "destructive"
+      });
+    }
+  }, [geoError, toast]);
 
   // Show error toast when weather fetch fails
-  if (weatherError) {
-    toast({
-      title: "Weather Error",
-      description: "Failed to fetch weather data. Please try again.",
-      variant: "destructive"
-    });
-  }
-  const isLoading = weatherLoading || forecastLoading;
+  useEffect(() => {
+    if (weatherError) {
+      toast({
+        title: "Weather Error",
+        description: "Failed to fetch weather data. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, [weatherError, toast]);
+
+  const isLoading = weatherLoading || forecastLoading || geoLoading;
   const isDaytime = () => {
-    if (!weatherData) return true;
+    if (!displayWeatherData) return true;
     const currentHour = new Date().getHours();
     return currentHour >= 6 && currentHour < 20;
   };
   return <div className="relative min-h-screen overflow-hidden">
       {/* Animated Background */}
-      <WeatherBackground condition={weatherData?.condition} isDaytime={isDaytime()} />
+      <WeatherBackground condition={displayWeatherData?.condition} isDaytime={isDaytime()} />
       
       {/* Weather Particles */}
-      {weatherData && <WeatherParticles condition={weatherData.condition} />}
+      {displayWeatherData && <WeatherParticles condition={displayWeatherData.condition} />}
       
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
         {/* Header with Theme Toggle and Refresh */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <Button onClick={manualRefresh} variant="ghost" size="icon" className="glass hover:bg-white/20 border-0" disabled={!weatherData}>
+          <Button onClick={manualRefresh} variant="ghost" size="icon" className="glass hover:bg-white/20 border-0" disabled={!displayWeatherData}>
             <RefreshCw className="h-5 w-5 text-white" />
           </Button>
           <ThemeToggle />
@@ -156,21 +171,21 @@ const Index = () => {
           </div>}
 
         {/* Weather Display */}
-        {weatherData && !isLoading && <motion.div initial={{
+        {displayWeatherData && !isLoading && <motion.div initial={{
         opacity: 0
       }} animate={{
         opacity: 1
       }} transition={{
         duration: 0.6
       }} className="w-full max-w-4xl space-y-6">
-            <WeatherCard data={weatherData} />
-            <WeatherMetrics data={weatherData} />
+            <WeatherCard data={displayWeatherData} />
+            <WeatherMetrics data={displayWeatherData} />
             {forecastData && <ForecastCard forecast={forecastData.daily} />}
-            <WeatherInsights temp={weatherData.temp} condition={weatherData.condition} humidity={weatherData.humidity} windSpeed={weatherData.windSpeed} />
+            <WeatherInsights temp={displayWeatherData.temp} condition={displayWeatherData.condition} humidity={displayWeatherData.humidity} windSpeed={displayWeatherData.windSpeed} />
           </motion.div>}
 
         {/* Initial State */}
-        {!weatherData && !isLoading && <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
+        {!displayWeatherData && !isLoading && <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
               <MapPin className="w-10 h-10 text-white" />
             </div>
@@ -184,7 +199,7 @@ const Index = () => {
       </div>
 
       {/* AI Chat Assistant */}
-      <AIChat weatherData={weatherData} />
+      <AIChat weatherData={displayWeatherData} />
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center z-10">

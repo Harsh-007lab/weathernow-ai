@@ -1,4 +1,5 @@
-import { Cloud, CloudRain, CloudSnow, Sun, CloudDrizzle, CloudLightning, Wind, Droplets, Gauge } from "lucide-react";
+import { Cloud, CloudRain, CloudSnow, Sun, CloudDrizzle, CloudLightning, Wind, Droplets } from "lucide-react";
+import { SunTrajectory } from "./SunTrajectory";
 
 interface WeatherData {
   city: string;
@@ -46,44 +47,44 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
   return (
     <div className="w-full max-w-2xl mx-auto animate-scale-in">
       {/* Main Weather Display */}
-      <div className="glass-strong rounded-3xl p-8 mb-6">
+      <div className="glass-strong rounded-3xl p-4 sm:p-6 md:p-8 mb-6">
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-white mb-2 text-shadow-strong">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 text-shadow-strong">
             {data.city}, {data.country}
           </h2>
-          <p className="text-white/80 text-lg mb-8">{data.condition}</p>
+          <p className="text-white/80 text-base sm:text-lg mb-6 sm:mb-8">{data.condition}</p>
           
-          <div className="flex items-center justify-center mb-8 animate-float">
+          <div className="flex items-center justify-center mb-6 sm:mb-8 animate-float">
             {getWeatherIcon(data.condition)}
           </div>
           
-          <div className="text-8xl font-bold text-white mb-4 text-shadow-strong">
+          <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-4 text-shadow-strong">
             {data.temp}°
           </div>
           
-          <div className="flex items-center justify-center gap-8 text-white/90">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90">
             <div className="text-center">
-              <div className="text-sm opacity-75">High</div>
-              <div className="text-2xl font-semibold">{data.maxTemp}°</div>
+              <div className="text-xs sm:text-sm opacity-75">High</div>
+              <div className="text-xl sm:text-2xl font-semibold">{data.maxTemp}°</div>
             </div>
-            <div className="w-px h-12 bg-white/30" />
+            <div className="w-px h-10 sm:h-12 bg-white/30" />
             <div className="text-center">
-              <div className="text-sm opacity-75">Low</div>
-              <div className="text-2xl font-semibold">{data.minTemp}°</div>
+              <div className="text-xs sm:text-sm opacity-75">Low</div>
+              <div className="text-xl sm:text-2xl font-semibold">{data.minTemp}°</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Detailed Stats Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {/* Humidity */}
-        <div className="glass rounded-2xl p-6 transition-transform hover:scale-105">
-          <div className="flex items-center gap-3 mb-3">
-            <Droplets className="w-6 h-6 text-blue-300" />
-            <span className="text-white/80 font-medium">Humidity</span>
+        <div className="glass rounded-2xl p-4 sm:p-6 transition-transform hover:scale-105">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300" />
+            <span className="text-white/80 font-medium text-sm sm:text-base">Humidity</span>
           </div>
-          <div className="text-3xl font-bold text-white">{data.humidity}%</div>
+          <div className="text-2xl sm:text-3xl font-bold text-white">{data.humidity}%</div>
           <div className="mt-3 bg-white/20 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-1000"
@@ -93,12 +94,12 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
         </div>
 
         {/* Wind Speed */}
-        <div className="glass rounded-2xl p-6 transition-transform hover:scale-105">
-          <div className="flex items-center gap-3 mb-3">
-            <Wind className="w-6 h-6 text-cyan-300" />
-            <span className="text-white/80 font-medium">Wind Speed</span>
+        <div className="glass rounded-2xl p-4 sm:p-6 transition-transform hover:scale-105">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300" />
+            <span className="text-white/80 font-medium text-sm sm:text-base">Wind</span>
           </div>
-          <div className="text-3xl font-bold text-white">{data.windSpeed} m/s</div>
+          <div className="text-2xl sm:text-3xl font-bold text-white">{data.windSpeed} m/s</div>
           <div className="mt-3 flex gap-1">
             {[...Array(5)].map((_, i) => (
               <div 
@@ -114,23 +115,8 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
           </div>
         </div>
 
-        {/* Sunrise */}
-        <div className="glass rounded-2xl p-6 transition-transform hover:scale-105">
-          <div className="flex items-center gap-3 mb-3">
-            <Sun className="w-6 h-6 text-orange-300" />
-            <span className="text-white/80 font-medium">Sunrise</span>
-          </div>
-          <div className="text-2xl font-bold text-white">{data.sunrise}</div>
-        </div>
-
-        {/* Sunset */}
-        <div className="glass rounded-2xl p-6 transition-transform hover:scale-105">
-          <div className="flex items-center gap-3 mb-3">
-            <Gauge className="w-6 h-6 text-purple-300" />
-            <span className="text-white/80 font-medium">Sunset</span>
-          </div>
-          <div className="text-2xl font-bold text-white">{data.sunset}</div>
-        </div>
+        {/* Sun Trajectory - Spans 2 columns */}
+        <SunTrajectory sunrise={data.sunrise} sunset={data.sunset} />
       </div>
     </div>
   );

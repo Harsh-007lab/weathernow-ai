@@ -35,6 +35,7 @@ export interface DailyForecast {
   dayOfWeek: string;
   minTemp: number;
   maxTemp: number;
+  avgTemp: number;
   condition: string;
   icon: string;
   humidity: number;

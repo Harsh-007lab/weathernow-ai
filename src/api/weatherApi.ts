@@ -11,11 +11,17 @@ const BASE_URL = "https://api.openweathermap.org/data/2.5";
  * Format Unix timestamp to local time string
  */
 const formatTime = (timestamp: number, timezoneOffset: number = 0): string => {
-  const date = new Date((timestamp + timezoneOffset) * 1000);
-  return date.toLocaleTimeString("en-US", { 
-    hour: "2-digit", 
-    minute: "2-digit",
-    hour12: true 
+  // Create a date object from the UTC timestamp
+  const date = new Date(timestamp * 1000);
+  
+  // Add the timezone offset (in seconds) to get the local time
+  const localTime = new Date(date.getTime() + timezoneOffset * 1000);
+  
+  return localTime.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC' // Use UTC since we already adjusted for timezone
   });
 };
 
@@ -34,13 +40,17 @@ export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => 
 
   const data: OpenWeatherResponse = await response.json();
   
+  // Get actual min/max from the API response
+  const minTemp = data.main.temp_min !== undefined ? Math.round(data.main.temp_min) : Math.round(data.main.temp - 2);
+  const maxTemp = data.main.temp_max !== undefined ? Math.round(data.main.temp_max) : Math.round(data.main.temp + 2);
+
   return {
     city: data.name,
     country: data.sys.country,
     condition: data.weather[0].main,
     temp: Math.round(data.main.temp),
-    minTemp: Math.round(data.main.temp_min),
-    maxTemp: Math.round(data.main.temp_max),
+    minTemp,
+    maxTemp,
     humidity: data.main.humidity,
     windSpeed: Math.round(data.wind.speed * 10) / 10,
     sunrise: formatTime(data.sys.sunrise, data.timezone),
@@ -66,13 +76,17 @@ export const fetchWeatherByCoords = async (lat: number, lon: number): Promise<We
 
   const data: OpenWeatherResponse = await response.json();
   
+  // Get actual min/max from the API response
+  const minTemp = data.main.temp_min !== undefined ? Math.round(data.main.temp_min) : Math.round(data.main.temp - 2);
+  const maxTemp = data.main.temp_max !== undefined ? Math.round(data.main.temp_max) : Math.round(data.main.temp + 2);
+
   return {
     city: data.name,
     country: data.sys.country,
     condition: data.weather[0].main,
     temp: Math.round(data.main.temp),
-    minTemp: Math.round(data.main.temp_min),
-    maxTemp: Math.round(data.main.temp_max),
+    minTemp,
+    maxTemp,
     humidity: data.main.humidity,
     windSpeed: Math.round(data.wind.speed * 10) / 10,
     sunrise: formatTime(data.sys.sunrise, data.timezone),
@@ -113,6 +127,7 @@ export const fetchForecastByCity = async (city: string): Promise<ForecastData> =
     const temps = items.map(i => i.main.temp);
     const minTemp = Math.round(Math.min(...temps));
     const maxTemp = Math.round(Math.max(...temps));
+    const avgTemp = Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
     
     // Use midday forecast for main condition
     const middayItem = items[Math.floor(items.length / 2)];
@@ -122,6 +137,7 @@ export const fetchForecastByCity = async (city: string): Promise<ForecastData> =
       dayOfWeek: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
       minTemp,
       maxTemp,
+      avgTemp,
       condition: middayItem.weather[0].main,
       icon: middayItem.weather[0].icon,
       humidity: middayItem.main.humidity,
