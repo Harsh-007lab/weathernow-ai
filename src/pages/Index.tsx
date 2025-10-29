@@ -188,8 +188,7 @@ const Index = () => {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center z-10">
-        <p className="text-white/50 text-sm hover:text-white/70 transition-colors">Powered by OpenWeatherMap API
-      </p>
+        
       </div>
     </div>;
 };
