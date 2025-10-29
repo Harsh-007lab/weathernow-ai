@@ -17,46 +17,54 @@ import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-
-const citySchema = z.string()
-  .trim()
-  .min(1, "City name is required")
-  .max(100, "City name is too long")
-  .regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
-
+const citySchema = z.string().trim().min(1, "City name is required").max(100, "City name is too long").regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
 const Index = () => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const { toast } = useToast();
-  
-  // Geolocation hook
-  const { location, loading: geoLoading, error: geoError, fetchLocation } = useGeoLocation(false);
-  
-  // Weather data hooks
-  const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity, !!selectedCity);
-  const { data: forecastData, isLoading: forecastLoading } = useForecast(selectedCity, !!selectedCity);
-  
-  // Auto-refresh every 15 minutes
-  const { manualRefresh } = useAutoRefresh(15, !!weatherData);
+  const {
+    toast
+  } = useToast();
 
+  // Geolocation hook
+  const {
+    location,
+    loading: geoLoading,
+    error: geoError,
+    fetchLocation
+  } = useGeoLocation(false);
+
+  // Weather data hooks
+  const {
+    data: weatherData,
+    isLoading: weatherLoading,
+    error: weatherError
+  } = useWeather(selectedCity, !!selectedCity);
+  const {
+    data: forecastData,
+    isLoading: forecastLoading
+  } = useForecast(selectedCity, !!selectedCity);
+
+  // Auto-refresh every 15 minutes
+  const {
+    manualRefresh
+  } = useAutoRefresh(15, !!weatherData);
   const handleSearch = async (city: string) => {
     try {
       citySchema.parse(city);
       setSelectedCity(city);
       toast({
         title: "Loading weather...",
-        description: `Fetching data for ${city}`,
+        description: `Fetching data for ${city}`
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Invalid city name",
           description: error.errors[0].message,
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     }
   };
-
   const handleLocationClick = () => {
     fetchLocation();
   };
@@ -66,7 +74,7 @@ const Index = () => {
     toast({
       title: "Location Error",
       description: geoError,
-      variant: "destructive",
+      variant: "destructive"
     });
   }
 
@@ -75,25 +83,18 @@ const Index = () => {
     toast({
       title: "Weather Error",
       description: "Failed to fetch weather data. Please try again.",
-      variant: "destructive",
+      variant: "destructive"
     });
   }
-
   const isLoading = weatherLoading || forecastLoading;
-
   const isDaytime = () => {
     if (!weatherData) return true;
     const currentHour = new Date().getHours();
     return currentHour >= 6 && currentHour < 20;
   };
-
-  return (
-    <div className="relative min-h-screen overflow-hidden">
+  return <div className="relative min-h-screen overflow-hidden">
       {/* Animated Background */}
-      <WeatherBackground 
-        condition={weatherData?.condition} 
-        isDaytime={isDaytime()}
-      />
+      <WeatherBackground condition={weatherData?.condition} isDaytime={isDaytime()} />
       
       {/* Weather Particles */}
       {weatherData && <WeatherParticles condition={weatherData.condition} />}
@@ -102,24 +103,21 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
         {/* Header with Theme Toggle and Refresh */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <Button
-            onClick={manualRefresh}
-            variant="ghost"
-            size="icon"
-            className="glass hover:bg-white/20 border-0"
-            disabled={!weatherData}
-          >
+          <Button onClick={manualRefresh} variant="ghost" size="icon" className="glass hover:bg-white/20 border-0" disabled={!weatherData}>
             <RefreshCw className="h-5 w-5 text-white" />
           </Button>
           <ThemeToggle />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: -20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        duration: 0.6
+      }} className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
             <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
             <h1 className="text-6xl md:text-7xl font-bold text-white text-shadow-strong">
@@ -132,61 +130,47 @@ const Index = () => {
         </motion.div>
 
         {/* Search with Location Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex items-center gap-3 w-full max-w-2xl mb-8"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        duration: 0.6,
+        delay: 0.2
+      }} className="flex items-center gap-3 w-full max-w-2xl mb-8">
           <div className="flex-1">
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
-          <Button
-            onClick={handleLocationClick}
-            disabled={geoLoading}
-            className="glass hover:bg-white/20 border-0 h-14 px-4"
-            size="icon"
-          >
-            {geoLoading ? (
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
-            ) : (
-              <Navigation className="w-5 h-5 text-white" />
-            )}
+          <Button onClick={handleLocationClick} disabled={geoLoading} className="glass hover:bg-white/20 border-0 h-14 px-4" size="icon">
+            {geoLoading ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Navigation className="w-5 h-5 text-white" />}
           </Button>
         </motion.div>
 
         {/* Loading Skeletons */}
-        {isLoading && (
-          <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+        {isLoading && <div className="w-full max-w-4xl space-y-6 animate-fade-in">
             <Skeleton className="w-full h-64 rounded-3xl glass" />
             <Skeleton className="w-full h-48 rounded-3xl glass" />
             <Skeleton className="w-full h-96 rounded-3xl glass" />
-          </div>
-        )}
+          </div>}
 
         {/* Weather Display */}
-        {weatherData && !isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="w-full max-w-4xl space-y-6"
-          >
+        {weatherData && !isLoading && <motion.div initial={{
+        opacity: 0
+      }} animate={{
+        opacity: 1
+      }} transition={{
+        duration: 0.6
+      }} className="w-full max-w-4xl space-y-6">
             <WeatherCard data={weatherData} />
             <WeatherMetrics data={weatherData} />
             {forecastData && <ForecastCard forecast={forecastData.daily} />}
-            <WeatherInsights 
-              temp={weatherData.temp}
-              condition={weatherData.condition}
-              humidity={weatherData.humidity}
-              windSpeed={weatherData.windSpeed}
-            />
-          </motion.div>
-        )}
+            <WeatherInsights temp={weatherData.temp} condition={weatherData.condition} humidity={weatherData.humidity} windSpeed={weatherData.windSpeed} />
+          </motion.div>}
 
         {/* Initial State */}
-        {!weatherData && !isLoading && (
-          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
+        {!weatherData && !isLoading && <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
               <MapPin className="w-10 h-10 text-white" />
             </div>
@@ -196,8 +180,7 @@ const Index = () => {
             <p className="text-white/70 max-w-md">
               Search for any city or use your current location to see weather conditions with AI-powered insights and 5-day forecasts
             </p>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* AI Chat Assistant */}
@@ -205,12 +188,9 @@ const Index = () => {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center z-10">
-        <p className="text-white/50 text-sm hover:text-white/70 transition-colors">
-          Powered by OpenWeatherMap API & Lovable AI
-        </p>
+        <p className="text-white/50 text-sm hover:text-white/70 transition-colors">Powered by OpenWeatherMap API
+      </p>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
