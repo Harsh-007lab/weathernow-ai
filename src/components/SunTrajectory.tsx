@@ -121,7 +121,7 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
         {/* Animated Sun */}
         {isDayTime && (
           <div 
-            className="absolute w-4 h-4 transition-all duration-1000"
+            className="absolute w-6 h-6 transition-all duration-1000"
             style={{
               left: `${currentSunPos.x}%`,
               top: `${currentSunPos.y}%`,
@@ -129,8 +129,12 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
             }}
           >
             <div className="relative">
+              {/* Opaque background to hide trajectory line */}
+              <div className="absolute inset-0 bg-gradient-to-br from-background to-background/80 rounded-full scale-150 -z-10" />
+              {/* Glow effect */}
               <div className="absolute inset-0 bg-yellow-400 rounded-full blur-md opacity-60 animate-pulse" />
-              <Sun className="w-4 h-4 text-yellow-300 relative z-10" />
+              {/* Sun icon */}
+              <Sun className="w-6 h-6 text-yellow-300 relative z-10 drop-shadow-lg" fill="currentColor" />
             </div>
           </div>
         )}
