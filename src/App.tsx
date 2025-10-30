@@ -31,7 +31,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
 
-        {/* ✅ Add analytics component at the very bottom */}
+        {/* ✅ Analytics component at the very bottom */}
         <Analytics />
       </TooltipProvider>
     </ThemeProvider>

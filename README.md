@@ -2,7 +2,11 @@
 
 A modern, production-grade weather application built with React, TypeScript, and Tailwind CSS. Features AI-powered insights, 5-day forecasts, and beautiful weather visualizations.
 
+<<<<<<< HEAD
 https://weatherproj.lovable.app/
+=======
+https://weathernow-ai.vercel.app/
+>>>>>>> a2d22e6f1ab167e51998600993eaa717231b3934
 
 ## ✨ Features
 
