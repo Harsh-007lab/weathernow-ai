@@ -1,8 +1,41 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const isDev = Deno.env.get('ENVIRONMENT') !== 'production';
+
+// Rate limiting
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 50;
+const RATE_WINDOW = 60 * 1000;
+
+// Input validation
+const WeatherInsightsSchema = z.object({
+  temp: z.number().min(-100).max(100),
+  condition: z.string().max(50),
+  humidity: z.number().min(0).max(100),
+  windSpeed: z.number().min(0).max(500),
+});
+
+const checkRateLimit = (identifier: string): boolean => {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(identifier, { count: 1, resetAt: now + RATE_WINDOW });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    return false;
+  }
+
+  record.count++;
+  return true;
 };
 
 serve(async (req) => {
@@ -11,7 +44,18 @@ serve(async (req) => {
   }
 
   try {
-    const { temp, condition, humidity, windSpeed } = await req.json();
+    // Rate limiting by IP
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    if (!checkRateLimit(clientIp)) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate input
+    const body = await req.json();
+    const { temp, condition, humidity, windSpeed } = WeatherInsightsSchema.parse(body);
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -52,8 +96,10 @@ Keep responses concise, friendly, and actionable.`;
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
+      if (isDev) {
+        const errorText = await response.text();
+        console.error("AI Gateway error:", response.status, errorText);
+      }
       
       if (response.status === 429) {
         return new Response(
@@ -106,9 +152,20 @@ Keep responses concise, friendly, and actionable.`;
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in weather-insights function:", error);
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid weather data', details: error.errors }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.error("Error in weather-insights:", {
+      type: error instanceof Error ? error.name : 'Unknown',
+      timestamp: new Date().toISOString(),
+    });
+    
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Unable to generate insights" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

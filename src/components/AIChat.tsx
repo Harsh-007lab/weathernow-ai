@@ -48,7 +48,7 @@ export const AIChat = ({ weatherData }: AIChatProps) => {
       });
 
       if (error) {
-        console.error('AI Chat error:', error);
+        // Error handling without sensitive logging
         if (error.message.includes('429')) {
           toast({
             title: "Rate limit reached",
@@ -76,7 +76,7 @@ export const AIChat = ({ weatherData }: AIChatProps) => {
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       }
     } catch (error) {
-      console.error('Error:', error);
+      // Minimal error logging in production
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",

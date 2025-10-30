@@ -28,7 +28,7 @@ export const WeatherInsights = ({ temp, condition, humidity, windSpeed }: Weathe
       });
 
       if (error) {
-        console.error('Error fetching insights:', error);
+        // Production-safe error handling
         if (error.message.includes('429')) {
           toast({
             title: "Rate limit reached",
@@ -49,7 +49,7 @@ export const WeatherInsights = ({ temp, condition, humidity, windSpeed }: Weathe
         setInsights(data.insights);
       }
     } catch (error) {
-      console.error('Error:', error);
+      // Errors handled silently in production
     } finally {
       setIsLoading(false);
     }

@@ -44,18 +44,13 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
 
       setIsLoadingSuggestions(true);
       try {
-        const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "f395d91f1589f0b9aa6128ddb040fc14";
-        const response = await fetch(
-          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city.trim())}&limit=5&appid=${API_KEY}`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          setSuggestions(data);
-          setShowSuggestions(data.length > 0);
-        }
+        const { fetchCitySuggestions } = await import('@/api/weatherApi');
+        const data = await fetchCitySuggestions(city.trim());
+        setSuggestions(data);
+        setShowSuggestions(data.length > 0);
       } catch (error) {
-        console.error("Failed to fetch suggestions:", error);
+        // Silently fail - user can still search manually
+        setSuggestions([]);
       } finally {
         setIsLoadingSuggestions(false);
       }
