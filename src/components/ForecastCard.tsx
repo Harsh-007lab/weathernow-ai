@@ -23,17 +23,17 @@ export const ForecastCard = ({ forecast }: ForecastCardProps) => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   return (
-    <Card className="glass p-4 sm:p-6 animate-scale-in hover-scale transition-all">
-      <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-shadow-soft">
+    <Card className="glass p-4 sm:p-6 animate-scale-in hover-scale transition-all card-glow">
+      <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-shadow-soft animate-slide-down">
         5-Day Forecast
       </h3>
       
-      <div className="space-y-3">
+      <div className="space-y-3 stagger-children">
         {forecast.map((day, index) => (
-          <div key={day.date}>
+          <div key={day.date} className="animate-slide-in-left" style={{'--stagger-delay': index + 1} as any}>
             <button
               onClick={() => setSelectedDay(selectedDay === index ? null : index)}
-              className="w-full bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm hover:bg-white/15 transition-all cursor-pointer"
+              className="w-full bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 cursor-pointer hover:scale-102 hover:shadow-lg"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">

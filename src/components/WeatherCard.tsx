@@ -47,22 +47,22 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
   return (
     <div className="w-full max-w-2xl mx-auto animate-scale-in">
       {/* Main Weather Display */}
-      <div className="glass-strong rounded-3xl p-4 sm:p-6 md:p-8 mb-6">
+      <div className="glass-strong rounded-3xl p-4 sm:p-6 md:p-8 mb-6 card-glow">
         <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 text-shadow-strong">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 text-shadow-strong animate-slide-down">
             {data.city}, {data.country}
           </h2>
-          <p className="text-white/80 text-base sm:text-lg mb-6 sm:mb-8">{data.condition}</p>
+          <p className="text-white/80 text-base sm:text-lg mb-6 sm:mb-8 animate-fade-in" style={{animationDelay: '0.1s'}}>{data.condition}</p>
           
           <div className="flex items-center justify-center mb-6 sm:mb-8 animate-float">
             {getWeatherIcon(data.condition)}
           </div>
           
-          <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-4 text-shadow-strong">
+          <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-4 text-shadow-strong animate-scale-in" style={{animationDelay: '0.2s'}}>
             {data.temp}°
           </div>
           
-          <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90 animate-slide-up" style={{animationDelay: '0.3s'}}>
             <div className="text-center">
               <div className="text-xs sm:text-sm opacity-75">High</div>
               <div className="text-xl sm:text-2xl font-semibold">{data.maxTemp}°</div>
@@ -77,26 +77,26 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
       </div>
 
       {/* Detailed Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 stagger-children">
         {/* Humidity */}
-        <div className="glass rounded-2xl p-4 sm:p-6 transition-transform hover:scale-105">
+        <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-left" style={{'--stagger-delay': 1} as any}>
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300" />
+            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300 animate-pulse-glow" />
             <span className="text-white/80 font-medium text-sm sm:text-base">Humidity</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-white">{data.humidity}%</div>
           <div className="mt-3 bg-white/20 rounded-full h-2 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-1000"
-              style={{ width: `${data.humidity}%` }}
+              className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-1000 animate-gradient"
+              style={{ width: `${data.humidity}%`, backgroundSize: '200% 100%' }}
             />
           </div>
         </div>
 
         {/* Wind Speed */}
-        <div className="glass rounded-2xl p-4 sm:p-6 transition-transform hover:scale-105">
+        <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-right" style={{'--stagger-delay': 2} as any}>
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300" />
+            <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300 animate-pulse-glow" />
             <span className="text-white/80 font-medium text-sm sm:text-base">Wind</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-white">{data.windSpeed} m/s</div>
@@ -104,12 +104,12 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
             {[...Array(5)].map((_, i) => (
               <div 
                 key={i}
-                className={`flex-1 h-2 rounded-full transition-all duration-500 ${
+                className={`flex-1 h-2 rounded-full transition-all duration-500 animate-scale-in ${
                   i < Math.min(5, Math.floor(data.windSpeed / 2)) 
                     ? "bg-gradient-to-r from-cyan-400 to-cyan-600" 
                     : "bg-white/20"
                 }`}
-                style={{ animationDelay: `${i * 100}ms` }}
+                style={{ animationDelay: `${(i * 100) + 400}ms` }}
               />
             ))}
           </div>

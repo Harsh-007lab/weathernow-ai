@@ -79,8 +79,8 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down relative" ref={searchRef}>
-      <div className="glass-strong rounded-2xl p-2 flex items-center gap-2">
-        <Search className="w-6 h-6 text-white/60 ml-4" />
+      <div className="glass-strong rounded-2xl p-2 flex items-center gap-2 card-glow transition-all duration-300 hover:shadow-2xl">
+        <Search className="w-6 h-6 text-white/60 ml-4 animate-pulse-glow" />
         <Input
           type="text"
           placeholder="Search for a city..."
@@ -88,14 +88,14 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
           onChange={(e) => setCity(e.target.value)}
           onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
           maxLength={100}
-          className="flex-1 bg-transparent border-0 text-white placeholder:text-white/50 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="flex-1 bg-transparent border-0 text-white placeholder:text-white/50 text-lg focus-visible:ring-0 focus-visible:ring-offset-0 transition-all"
           disabled={isLoading}
           autoComplete="off"
         />
         <Button
           type="submit"
           disabled={isLoading || !city.trim()}
-          className="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-6 rounded-xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+          className="btn-modern bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-6 rounded-xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 relative z-10"
         >
           {isLoading ? (
             <>
@@ -110,7 +110,7 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
 
       {/* Suggestions Dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 glass-strong rounded-xl overflow-hidden shadow-2xl z-50 backdrop-blur-md border border-white/20">
+        <div className="absolute top-full left-0 right-0 mt-2 glass-strong rounded-xl overflow-hidden shadow-2xl z-50 backdrop-blur-md border border-white/20 animate-slide-down">
           {isLoadingSuggestions ? (
             <div className="p-4 text-center text-white/60">
               <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -121,9 +121,10 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
                 <li
                   key={`${suggestion.lat}-${suggestion.lon}-${index}`}
                   onClick={() => handleSelectSuggestion(suggestion)}
-                  className="px-4 py-3 hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3 text-white"
+                  className="px-4 py-3 hover:bg-white/10 cursor-pointer transition-all duration-200 flex items-center gap-3 text-white hover:translate-x-1 animate-fade-in"
+                  style={{animationDelay: `${index * 50}ms`}}
                 >
-                  <MapPin className="w-4 h-4 text-white/60 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-white/60 flex-shrink-0 transition-transform group-hover:scale-110" />
                   <div className="flex-1">
                     <div className="font-medium">
                       {suggestion.name}
