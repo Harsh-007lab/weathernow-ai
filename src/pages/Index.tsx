@@ -17,65 +17,74 @@ import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-const citySchema = z.string().trim().min(1, "City name is required").max(100, "City name is too long").regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
+
+const citySchema = z
+  .string()
+  .trim()
+  .min(1, "City name is required")
+  .max(100, "City name is too long")
+  .regex(/^[a-zA-Z\s\-,\.]+$/, "City name contains invalid characters");
+
 const Index = () => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const {
-    toast
-  } = useToast();
+  const [mode, setMode] = useState<"city" | "location">("city"); // 👈 mode switch
+  const { toast } = useToast();
 
   // Geolocation hook
-  const {
-    location,
-    loading: geoLoading,
-    error: geoError,
-    fetchLocation
-  } = useGeoLocation(false);
+  const { location, loading: geoLoading, error: geoError, fetchLocation } =
+    useGeoLocation(false);
 
-  // Weather data hooks
+  // Weather by city
   const {
     data: weatherData,
     isLoading: weatherLoading,
-    error: weatherError
-  } = useWeather(selectedCity, !!selectedCity);
-  const {
-    data: forecastData,
-    isLoading: forecastLoading
-  } = useForecast(selectedCity, !!selectedCity);
+    error: weatherError,
+  } = useWeather(selectedCity, mode === "city" && !!selectedCity);
 
-  // Weather by coordinates hook
+  // Forecast by city
+  const { data: forecastData, isLoading: forecastLoading } = useForecast(
+    selectedCity,
+    mode === "city" && !!selectedCity
+  );
+
+  // Weather by coordinates
   const { data: weatherByCoords } = useWeatherByCoords(
     location?.latitude ?? null,
     location?.longitude ?? null,
-    !!location
+    mode === "location" && !!location
   );
 
-  // Use weatherByCoords if available, otherwise use city-based weather
-  const displayWeatherData = weatherByCoords || weatherData;
+  // 👇 Use correct weather source based on mode
+  const displayWeatherData =
+    mode === "location" ? weatherByCoords : weatherData;
 
   // Auto-refresh every 15 minutes
-  const {
-    manualRefresh
-  } = useAutoRefresh(15, !!displayWeatherData);
+  const { manualRefresh } = useAutoRefresh(15, !!displayWeatherData);
+
+  // Handle city search
   const handleSearch = async (city: string) => {
     try {
       citySchema.parse(city);
+      setMode("city"); // 👈 Switch to city mode
       setSelectedCity(city);
       toast({
         title: "Loading weather...",
-        description: `Fetching data for ${city}`
+        description: `Fetching data for ${city}`,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Invalid city name",
           description: error.errors[0].message,
-          variant: "destructive"
+          variant: "destructive",
         });
       }
     }
   };
+
+  // Handle location button
   const handleLocationClick = () => {
+    setMode("location"); // 👈 Switch to location mode
     fetchLocation();
   };
 
@@ -85,7 +94,7 @@ const Index = () => {
       toast({
         title: "Location Error",
         description: geoError,
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   }, [geoError, toast]);
@@ -96,43 +105,55 @@ const Index = () => {
       toast({
         title: "Weather Error",
         description: "Failed to fetch weather data. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   }, [weatherError, toast]);
 
   const isLoading = weatherLoading || forecastLoading || geoLoading;
+
   const isDaytime = () => {
     if (!displayWeatherData) return true;
     const currentHour = new Date().getHours();
     return currentHour >= 6 && currentHour < 20;
   };
-  return <div className="relative min-h-screen overflow-hidden">
+
+  return (
+    <div className="relative min-h-screen overflow-hidden">
       {/* Animated Background */}
-      <WeatherBackground condition={displayWeatherData?.condition} isDaytime={isDaytime()} />
-      
+      <WeatherBackground
+        condition={displayWeatherData?.condition}
+        isDaytime={isDaytime()}
+      />
+
       {/* Weather Particles */}
-      {displayWeatherData && <WeatherParticles condition={displayWeatherData.condition} />}
-      
+      {displayWeatherData && (
+        <WeatherParticles condition={displayWeatherData.condition} />
+      )}
+
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
-        {/* Header with Theme Toggle and Refresh */}
+        {/* Header */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <Button onClick={manualRefresh} variant="ghost" size="icon" className="glass hover:bg-white/20 border-0" disabled={!displayWeatherData}>
+          <Button
+            onClick={manualRefresh}
+            variant="ghost"
+            size="icon"
+            className="glass hover:bg-white/20 border-0"
+            disabled={!displayWeatherData}
+          >
             <RefreshCw className="h-5 w-5 text-white" />
           </Button>
           <ThemeToggle />
         </div>
 
-        <motion.div initial={{
-        opacity: 0,
-        y: -20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.6
-      }} className="text-center mb-12">
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
           <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
             <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
             <h1 className="text-6xl md:text-7xl font-bold text-white text-shadow-strong">
@@ -144,48 +165,62 @@ const Index = () => {
           </p>
         </motion.div>
 
-        {/* Search with Location Button */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.6,
-        delay: 0.2
-      }} className="flex items-center gap-3 w-full max-w-2xl mb-8">
+        {/* Search and location */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex items-center gap-3 w-full max-w-2xl mb-8"
+        >
           <div className="flex-1">
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
-          <Button onClick={handleLocationClick} disabled={geoLoading} className="glass hover:bg-white/20 border-0 h-14 px-4" size="icon">
-            {geoLoading ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Navigation className="w-5 h-5 text-white" />}
+          <Button
+            onClick={handleLocationClick}
+            disabled={geoLoading}
+            className="glass hover:bg-white/20 border-0 h-14 px-4"
+            size="icon"
+          >
+            {geoLoading ? (
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
+            ) : (
+              <Navigation className="w-5 h-5 text-white" />
+            )}
           </Button>
         </motion.div>
 
-        {/* Loading Skeletons */}
-        {isLoading && <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+        {/* Loading skeletons */}
+        {isLoading && (
+          <div className="w-full max-w-4xl space-y-6 animate-fade-in">
             <Skeleton className="w-full h-64 rounded-3xl glass" />
             <Skeleton className="w-full h-48 rounded-3xl glass" />
             <Skeleton className="w-full h-96 rounded-3xl glass" />
-          </div>}
+          </div>
+        )}
 
-        {/* Weather Display */}
-        {displayWeatherData && !isLoading && <motion.div initial={{
-        opacity: 0
-      }} animate={{
-        opacity: 1
-      }} transition={{
-        duration: 0.6
-      }} className="w-full max-w-4xl space-y-6">
+        {/* Weather content */}
+        {displayWeatherData && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-4xl space-y-6"
+          >
             <WeatherCard data={displayWeatherData} />
             <WeatherMetrics data={displayWeatherData} />
             {forecastData && <ForecastCard forecast={forecastData.daily} />}
-            <WeatherInsights temp={displayWeatherData.temp} condition={displayWeatherData.condition} humidity={displayWeatherData.humidity} windSpeed={displayWeatherData.windSpeed} />
-          </motion.div>}
+            <WeatherInsights
+              temp={displayWeatherData.temp}
+              condition={displayWeatherData.condition}
+              humidity={displayWeatherData.humidity}
+              windSpeed={displayWeatherData.windSpeed}
+            />
+          </motion.div>
+        )}
 
-        {/* Initial State */}
-        {!displayWeatherData && !isLoading && <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
+        {/* Initial state */}
+        {!displayWeatherData && !isLoading && (
+          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
               <MapPin className="w-10 h-10 text-white" />
             </div>
@@ -193,18 +228,17 @@ const Index = () => {
               Discover Weather Anywhere
             </h3>
             <p className="text-white/70 max-w-md">
-              Search for any city or use your current location to see weather conditions with AI-powered insights and 5-day forecasts
+              Search for any city or use your current location to see weather
+              conditions with AI-powered insights and 5-day forecasts
             </p>
-          </div>}
+          </div>
+        )}
       </div>
 
-      {/* AI Chat Assistant */}
+      {/* AI Assistant */}
       <AIChat weatherData={displayWeatherData} />
-
-      {/* Footer */}
-      <div className="absolute bottom-4 left-0 right-0 text-center z-10">
-        
-      </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
