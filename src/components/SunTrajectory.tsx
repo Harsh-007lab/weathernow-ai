@@ -56,7 +56,7 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
   const getSunPosition = (percentage: number) => {
     const t = percentage / 100;
     const width = 100;
-    const height = 100;
+    const height = 80;
     const startX = 0;
     const startY = height;
     const endX = width;
