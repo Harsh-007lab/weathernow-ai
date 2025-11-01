@@ -4,7 +4,7 @@ A modern, production-grade weather application built with React, TypeScript, and
 
 🌐 **Live Demo:**  
 https://weathernow-ai.vercel.app/  
-*(Developed & Owned by Light Yagami)*
+*(Developed & Owned by Harsh Agrawal)*
 
 ---
 
