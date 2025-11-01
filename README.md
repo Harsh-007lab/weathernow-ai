@@ -132,8 +132,8 @@ AI services © Lovable Cloud / Google Gemini 2.5 Flash.
 👑 Author
 
 Developed & Owned by:
-🧑‍💻 Harsh Agrawal
-🌐 https://github.com/LIGHT7418
+#🧑‍💻 Harsh Agrawal
+#🌐 https://github.com/LIGHT7418
 
 📧 Contact: 
 
