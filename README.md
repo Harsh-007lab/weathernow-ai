@@ -56,25 +56,6 @@ https://weathernow-ai.vercel.app/
 
 ---
 
-🏗️ Project Structure
-src/
-├── api/              # Weather API services
-├── components/       # UI components (WeatherCard, ForecastCard, etc.)
-├── context/          # Global providers
-├── hooks/            # Custom React hooks (useWeather, useGeoLocation)
-├── types/            # TypeScript definitions
-├── pages/            # Page components (Index.tsx)
-└── utils/            # Utility helpers
-
-supabase/
-└── functions/        # Edge Functions for AI & Weather Insights
-    ├── weather-insights/
-    └── ai-chat/
-
-public/
-├── manifest.json     # PWA manifest
-└── sw.js             # Service worker
-
 🎨 Design System
 
 Theme-aware color tokens (light/dark/auto)
