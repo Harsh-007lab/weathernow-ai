@@ -1,14 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense, useCallback, useMemo } from "react";
 import { z } from "zod";
 import { WeatherBackground } from "@/components/WeatherBackground";
 import { WeatherParticles } from "@/components/WeatherParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
-import { WeatherInsights } from "@/components/WeatherInsights";
-import { ForecastCard } from "@/components/ForecastCard";
-import { WeatherMetrics } from "@/components/WeatherMetrics";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { AIChat } from "@/components/AIChat";
 import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
@@ -19,6 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { updateMetaTags, generateWeatherSchema, injectStructuredData } from "@/lib/seo";
+
+// Lazy-load heavy components for better performance
+const WeatherMetrics = lazy(() => import("@/components/WeatherMetrics").then(m => ({ default: m.WeatherMetrics })));
+const ForecastCard = lazy(() => import("@/components/ForecastCard").then(m => ({ default: m.ForecastCard })));
+const WeatherInsights = lazy(() => import("@/components/WeatherInsights").then(m => ({ default: m.WeatherInsights })));
+const AIChat = lazy(() => import("@/components/AIChat").then(m => ({ default: m.AIChat })));
 
 const citySchema = z
   .string()
@@ -63,11 +65,11 @@ const Index = () => {
   // Auto-refresh every 15 minutes
   const { manualRefresh } = useAutoRefresh(15, !!displayWeatherData);
 
-  // Handle city search
-  const handleSearch = async (city: string) => {
+  // Handle city search (memoized)
+  const handleSearch = useCallback(async (city: string) => {
     try {
       citySchema.parse(city);
-      setMode("city"); // 👈 Switch to city mode
+      setMode("city");
       setSelectedCity(city);
       toast({
         title: "Loading weather...",
@@ -82,13 +84,13 @@ const Index = () => {
         });
       }
     }
-  };
+  }, [toast]);
 
-  // Handle location button
-  const handleLocationClick = () => {
-    setMode("location"); // 👈 Switch to location mode
+  // Handle location button (memoized)
+  const handleLocationClick = useCallback(() => {
+    setMode("location");
     fetchLocation();
-  };
+  }, [fetchLocation]);
 
   // Show error toast when geo location fails
   useEffect(() => {
@@ -114,11 +116,11 @@ const Index = () => {
 
   const isLoading = weatherLoading || forecastLoading || geoLoading;
 
-  const isDaytime = () => {
+  const isDaytime = useMemo(() => {
     if (!displayWeatherData) return true;
     const currentHour = new Date().getHours();
     return currentHour >= 6 && currentHour < 20;
-  };
+  }, [displayWeatherData]);
 
   // Update SEO when weather data changes
   useEffect(() => {
@@ -148,7 +150,7 @@ const Index = () => {
       {/* Animated Background */}
       <WeatherBackground
         condition={displayWeatherData?.condition}
-        isDaytime={isDaytime()}
+        isDaytime={isDaytime}
       />
 
       {/* Weather Particles */}
@@ -232,14 +234,25 @@ const Index = () => {
             className="w-full max-w-4xl space-y-6"
           >
             <WeatherCard data={displayWeatherData} />
-            <WeatherMetrics data={displayWeatherData} />
-            {forecastData && <ForecastCard forecast={forecastData.daily} />}
-            <WeatherInsights
-              temp={displayWeatherData.temp}
-              condition={displayWeatherData.condition}
-              humidity={displayWeatherData.humidity}
-              windSpeed={displayWeatherData.windSpeed}
-            />
+            
+            <Suspense fallback={<Skeleton className="w-full h-48 rounded-3xl glass" />}>
+              <WeatherMetrics data={displayWeatherData} />
+            </Suspense>
+            
+            {forecastData && (
+              <Suspense fallback={<Skeleton className="w-full h-64 rounded-3xl glass" />}>
+                <ForecastCard forecast={forecastData.daily} />
+              </Suspense>
+            )}
+            
+            <Suspense fallback={<Skeleton className="w-full h-96 rounded-3xl glass" />}>
+              <WeatherInsights
+                temp={displayWeatherData.temp}
+                condition={displayWeatherData.condition}
+                humidity={displayWeatherData.humidity}
+                windSpeed={displayWeatherData.windSpeed}
+              />
+            </Suspense>
           </motion.div>
         )}
 
@@ -263,8 +276,10 @@ const Index = () => {
       {/* Footer */}
       <Footer />
 
-      {/* AI Assistant */}
-      <AIChat weatherData={displayWeatherData} />
+      {/* AI Assistant - Lazy loaded */}
+      <Suspense fallback={null}>
+        <AIChat weatherData={displayWeatherData} />
+      </Suspense>
     </div>
   );
 };
