@@ -9,6 +9,7 @@ import { ForecastCard } from "@/components/ForecastCard";
 import { WeatherMetrics } from "@/components/WeatherMetrics";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AIChat } from "@/components/AIChat";
+import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
@@ -17,6 +18,7 @@ import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import { updateMetaTags, generateWeatherSchema, injectStructuredData } from "@/lib/seo";
 
 const citySchema = z
   .string()
@@ -117,6 +119,29 @@ const Index = () => {
     const currentHour = new Date().getHours();
     return currentHour >= 6 && currentHour < 20;
   };
+
+  // Update SEO when weather data changes
+  useEffect(() => {
+    if (displayWeatherData && selectedCity) {
+      updateMetaTags({
+        title: `${selectedCity} Weather | WeatherNow - Real-Time Forecast`,
+        description: `Current weather in ${selectedCity}: ${displayWeatherData.temp}°C, ${displayWeatherData.condition}. Get accurate forecasts and AI insights with WeatherNow.`,
+        keywords: `${selectedCity} weather, ${selectedCity} forecast, weather ${selectedCity}, temperature ${selectedCity}`,
+      });
+
+      const schema = generateWeatherSchema(selectedCity, displayWeatherData.temp);
+      injectStructuredData(schema);
+    } else {
+      // Default homepage SEO
+      updateMetaTags({
+        title: "WeatherNow | Live Forecasts, Smart Insights & AI Weather Assistant",
+        description: "Stay ahead of the storm with WeatherNow — real-time forecasts, 5-day predictions, and AI-powered outfit & activity suggestions tailored for your day.",
+        keywords: "WeatherNow, weather forecast, real-time weather, AI weather insights, 5-day forecast",
+      });
+
+      injectStructuredData(generateWeatherSchema());
+    }
+  }, [displayWeatherData, selectedCity]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -234,6 +259,9 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <Footer />
 
       {/* AI Assistant */}
       <AIChat weatherData={displayWeatherData} />
