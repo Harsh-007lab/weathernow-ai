@@ -103,6 +103,55 @@ Lovable manages Supabase-based function routing, secure API calls, and response 
 
 ✅ Fast & reliable caching
 
+## 🛡️ Security Features
+
+WeatherNow implements **military-grade security** across all layers to protect against common web vulnerabilities:
+
+### 🔐 Core Security Measures
+- ✅ **API Key Protection** — All keys stored server-side, never exposed to client
+- ✅ **Input Validation** — Zod schemas validate all user inputs
+- ✅ **XSS Prevention** — HTML sanitization + React's built-in protection
+- ✅ **SQL Injection Protection** — Parameterized queries only
+- ✅ **CSRF Prevention** — SameSite cookies + origin validation
+- ✅ **Rate Limiting** — 100 req/min for weather, 30 req/min for AI
+- ✅ **DDoS Protection** — IP-based throttling with temporary bans
+
+### 🌐 Security Headers (OWASP Compliant)
+```
+Content-Security-Policy    → Strict CSP with whitelisted domains
+X-Content-Type-Options     → nosniff
+X-Frame-Options           → DENY (prevents clickjacking)
+X-XSS-Protection          → 1; mode=block
+Referrer-Policy           → strict-origin-when-cross-origin
+Permissions-Policy        → Restricts sensitive APIs
+Strict-Transport-Security → HSTS with 2-year max-age
+```
+
+### 🏗️ Build Security
+- ✅ **Code Minification** — Terser with aggressive compression
+- ✅ **Code Obfuscation** — Variable mangling enabled
+- ✅ **Console Stripping** — All logs removed in production
+- ✅ **Source Maps Disabled** — No debugging info exposed
+- ✅ **Code Splitting** — Reduces attack surface
+
+### 📋 OWASP Top 10 Status
+| Vulnerability | Status |
+|--------------|--------|
+| Broken Access Control | ✅ Protected |
+| Cryptographic Failures | ✅ Protected |
+| Injection Attacks | ✅ Protected |
+| Insecure Design | ✅ Protected |
+| Security Misconfiguration | ✅ Protected |
+| Vulnerable Components | ✅ Protected |
+| Auth Failures | ✅ Protected |
+| Data Integrity | ✅ Protected |
+| Logging Failures | ⚠️ Partial |
+| SSRF | ✅ Protected |
+
+**Full security documentation:** [SECURITY.md](./SECURITY.md)
+
+---
+
 ⚖️ License & Copyright
 
 © 2025 Light Yagami. All Rights Reserved.

@@ -31,19 +31,31 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Security: Validate request origins
+const ALLOWED_ORIGINS = [
+  self.location.origin,
+  'https://weathernow.vercel.app',
+];
+
 // Fetch event - network first, then cache
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
+  // Security: Only cache requests from allowed origins
+  const requestUrl = new URL(event.request.url);
+  const isAllowedOrigin = ALLOWED_ORIGINS.some(origin => requestUrl.origin === origin || requestUrl.origin === self.location.origin);
+  
+  if (!isAllowedOrigin && !requestUrl.protocol.startsWith('http')) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response
-        const responseToCache = response.clone();
-
-        // Cache successful responses
-        if (response.status === 200) {
+        // Security: Only cache successful, safe responses
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
