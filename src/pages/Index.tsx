@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Footer } from "@/components/Footer";
+import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
@@ -200,7 +201,12 @@ const Index = () => {
           className="flex items-center gap-3 w-full max-w-2xl mb-8"
         >
           <div className="flex-1">
-            <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+            <SearchBar 
+              onSearch={handleSearch} 
+              isLoading={isLoading}
+              currentCity={displayWeatherData?.city}
+              currentCountry={displayWeatherData?.country}
+            />
           </div>
           <Button
             onClick={handleLocationClick}
@@ -215,6 +221,12 @@ const Index = () => {
             )}
           </Button>
         </motion.div>
+
+        {/* Favorites Panel */}
+        <FavoritesPanel 
+          onCityClick={handleSearch} 
+          currentCity={displayWeatherData?.city}
+        />
 
         {/* Loading skeletons */}
         {isLoading && (

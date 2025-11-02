@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Search, Loader2, MapPin, Clock } from "lucide-react";
+import { Search, Loader2, MapPin, Clock, Heart, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface CityOption {
   name: string;
@@ -33,30 +35,23 @@ const getCountryFlag = (countryCode: string): string => {
 interface SearchBarProps {
   onSearch: (city: string) => void;
   isLoading?: boolean;
+  currentCity?: string | null;
+  currentCountry?: string | null;
 }
 
-export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
+export const SearchBar = ({ onSearch, isLoading = false, currentCity, currentCountry }: SearchBarProps) => {
   const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState<CityOption[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [showRecent, setShowRecent] = useState(false);
   const searchRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load recent searches from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("weathernow_recent_searches");
-    if (stored) {
-      try {
-        setRecentSearches(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse recent searches", e);
-      }
-    }
-  }, []);
+  // Use new hooks
+  const { history, addSearch, removeSearch, clearHistory } = useSearchHistory();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Auto-focus input on mount
   useEffect(() => {
@@ -74,7 +69,7 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch suggestions with debouncing (400ms)
+  // Fetch suggestions with debouncing (300ms for faster response)
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (city.trim().length < 2) {
@@ -99,30 +94,21 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
       }
     };
 
-    const timeoutId = setTimeout(fetchSuggestions, 400);
+    const timeoutId = setTimeout(fetchSuggestions, 300);
     return () => clearTimeout(timeoutId);
   }, [city]);
-
-  // Save to recent searches
-  const saveRecentSearch = useCallback((searchTerm: string) => {
-    setRecentSearches((prev) => {
-      const updated = [searchTerm, ...prev.filter((s) => s !== searchTerm)].slice(0, 5);
-      localStorage.setItem("weathernow_recent_searches", JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (city.trim()) {
       const searchTerm = city.trim();
       onSearch(searchTerm);
-      saveRecentSearch(searchTerm);
+      addSearch(searchTerm);
       setShowSuggestions(false);
       setShowRecent(false);
       inputRef.current?.blur();
     }
-  }, [city, onSearch, saveRecentSearch]);
+  }, [city, onSearch, addSearch]);
 
   const handleSelectSuggestion = useCallback((suggestion: CityOption) => {
     const cityName = suggestion.state 
@@ -132,30 +118,31 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
     setShowSuggestions(false);
     setShowRecent(false);
     onSearch(cityName);
-    saveRecentSearch(cityName);
+    addSearch(cityName);
     inputRef.current?.blur();
-  }, [onSearch, saveRecentSearch]);
+  }, [onSearch, addSearch]);
 
   const handleRecentClick = useCallback((recent: string) => {
     setCity(recent);
     setShowRecent(false);
     setShowSuggestions(false);
     onSearch(recent);
+    addSearch(recent);
     inputRef.current?.blur();
-  }, [onSearch]);
+  }, [onSearch, addSearch]);
 
   const handlePopularClick = useCallback((popular: string) => {
     setCity(popular);
     setShowRecent(false);
     setShowSuggestions(false);
     onSearch(popular);
-    saveRecentSearch(popular);
+    addSearch(popular);
     inputRef.current?.blur();
-  }, [onSearch, saveRecentSearch]);
+  }, [onSearch, addSearch]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    const currentSuggestions = showRecent ? recentSearches : suggestions;
+    const currentSuggestions = showRecent ? history.map(h => h.city) : suggestions;
     const maxIndex = currentSuggestions.length - 1;
 
     if (e.key === "ArrowDown") {
@@ -167,7 +154,7 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
       if (showRecent) {
-        handleRecentClick(recentSearches[selectedIndex]);
+        handleRecentClick(history[selectedIndex].city);
       } else if (suggestions[selectedIndex]) {
         handleSelectSuggestion(suggestions[selectedIndex]);
       }
@@ -176,23 +163,67 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
       setShowRecent(false);
       inputRef.current?.blur();
     }
-  }, [selectedIndex, suggestions, showRecent, recentSearches, handleSelectSuggestion, handleRecentClick]);
+  }, [selectedIndex, suggestions, showRecent, history, handleSelectSuggestion, handleRecentClick]);
 
   // Display list (recent searches or suggestions)
   const displayList = useMemo(() => {
-    if (showRecent && recentSearches.length > 0) {
-      return { type: "recent" as const, items: recentSearches };
+    if (showRecent && history.length > 0) {
+      return { type: "recent" as const, items: history };
     }
     if (showSuggestions && suggestions.length > 0) {
       return { type: "suggestions" as const, items: suggestions };
     }
     return null;
-  }, [showRecent, recentSearches, showSuggestions, suggestions]);
+  }, [showRecent, history, showSuggestions, suggestions]);
+
+  // Format timestamp for display
+  const formatTimestamp = useCallback((timestamp: number) => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  }, []);
+
+  // Check if current city is favorite
+  const isCurrentFavorite = useMemo(() => {
+    return currentCity ? isFavorite(currentCity) : false;
+  }, [currentCity, isFavorite]);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = useCallback(() => {
+    if (currentCity) {
+      toggleFavorite(currentCity, currentCountry || undefined);
+    }
+  }, [currentCity, currentCountry, toggleFavorite]);
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down relative" ref={searchRef}>
       <div className="glass-strong rounded-2xl p-2 flex items-center gap-2 card-glow transition-all duration-300 hover:shadow-2xl">
-        <Search className="w-6 h-6 text-white/60 ml-4 animate-pulse-glow" />
+        <Search className="w-6 h-6 text-white/60 ml-4" />
+        {currentCity && (
+          <Button
+            type="button"
+            onClick={handleFavoriteToggle}
+            size="icon"
+            variant="ghost"
+            className="hover:bg-white/10 transition-all"
+            title={isCurrentFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart 
+              className={`w-5 h-5 transition-all ${
+                isCurrentFavorite 
+                  ? 'fill-red-500 text-red-500' 
+                  : 'text-white/60 hover:text-red-400'
+              }`} 
+            />
+          </Button>
+        )}
         <Input
           ref={inputRef}
           type="text"
@@ -200,7 +231,7 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
           value={city}
           onChange={(e) => setCity(e.target.value)}
           onFocus={() => {
-            if (city.trim().length < 2 && recentSearches.length > 0) {
+            if (city.trim().length < 2 && history.length > 0) {
               setShowRecent(true);
             } else if (suggestions.length > 0) {
               setShowSuggestions(true);
@@ -248,26 +279,53 @@ export const SearchBar = ({ onSearch, isLoading = false }: SearchBarProps) => {
             <ul className="py-2 max-h-80 overflow-y-auto">
               {displayList.type === "recent" ? (
                 <>
-                  <li className="px-4 py-2 text-xs text-white/40 font-semibold uppercase tracking-wider">
-                    Recent Searches
+                  <li className="px-4 py-2 text-xs text-white/40 font-semibold uppercase tracking-wider flex items-center justify-between">
+                    <span>Recent Searches</span>
+                    {history.length > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearHistory();
+                        }}
+                        className="text-white/40 hover:text-red-400 transition-colors"
+                        title="Clear history"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </li>
-                  {displayList.items.map((recent, index) => (
+                  {displayList.items.map((item, index) => (
                     <li
                       key={`recent-${index}`}
                       id={`suggestion-${index}`}
                       role="option"
                       aria-selected={selectedIndex === index}
-                      onClick={() => handleRecentClick(recent)}
-                      className={`px-4 py-3 cursor-pointer transition-all duration-200 flex items-center gap-3 text-white hover:translate-x-1 animate-fade-in ${
+                      className={`group px-4 py-3 cursor-pointer transition-all duration-200 flex items-center gap-3 text-white hover:translate-x-1 animate-fade-in ${
                         selectedIndex === index ? "bg-white/20" : "hover:bg-white/10"
                       }`}
                       style={{animationDelay: `${index * 50}ms`}}
                     >
                       <Clock className="w-4 h-4 text-white/60 flex-shrink-0" />
-                      <div className="flex-1 font-medium">{recent}</div>
+                      <div 
+                        className="flex-1 flex items-center justify-between"
+                        onClick={() => handleRecentClick(item.city)}
+                      >
+                        <span className="font-medium">{item.city}</span>
+                        <span className="text-xs text-white/40 ml-2">{formatTimestamp(item.timestamp)}</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSearch(item.city);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
                     </li>
                   ))}
-                  {recentSearches.length > 0 && (
+                  {history.length > 0 && (
                     <>
                       <li className="px-4 py-2 mt-2 text-xs text-white/40 font-semibold uppercase tracking-wider">
                         Popular Cities
