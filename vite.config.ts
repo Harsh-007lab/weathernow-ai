@@ -3,49 +3,43 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "0.0.0.0", // IPv4-compatible
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger()
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
-    // Security: Minify and obfuscate code
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production',
+        drop_console: mode === "production" && process.env.VERCEL_ENV === "production",
+        drop_debugger: mode === "production" && process.env.VERCEL_ENV === "production",
       },
-      mangle: {
-        safari10: true,
-      },
-      format: {
-        comments: false,
-      },
+      mangle: { safari10: true },
+      format: { comments: false },
     },
-    // Code splitting for better performance and security
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-          'query-vendor': ['@tanstack/react-query'],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-vendor": ["framer-motion", "@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu"],
+          "query-vendor": ["@tanstack/react-query"],
         },
       },
     },
-    // Generate source maps only in development
-    sourcemap: mode === 'development',
+    sourcemap: mode === "development", // enabled only for local
   },
-  // Prevent exposure of env variables
+  // Don't override env handling
   define: {
-    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(process.env.VITE_SUPABASE_URL || ''),
-    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(process.env.VITE_SUPABASE_PUBLISHABLE_KEY || ''),
+    "process.env": process.env,
   },
 }));
