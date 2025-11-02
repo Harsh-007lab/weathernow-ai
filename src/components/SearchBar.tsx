@@ -206,7 +206,7 @@ export const SearchBar = ({ onSearch, isLoading = false, currentCity, currentCou
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down relative" ref={searchRef}>
       <div className="glass-strong rounded-2xl p-2 flex items-center gap-2 card-glow transition-all duration-300 hover:shadow-2xl">
         <Search className="w-6 h-6 text-white/60 ml-4" />
-        {currentCity && (
+        {currentCity && city.trim() && (
           <Button
             type="button"
             onClick={handleFavoriteToggle}
