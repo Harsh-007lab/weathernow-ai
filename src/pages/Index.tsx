@@ -175,20 +175,19 @@ const Index = () => {
           <ThemeToggle />
         </div>
 
-        {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12 px-4"
         >
-          <div className="flex items-center justify-center gap-3 mb-4 hover-scale">
-            <MapPin className="w-10 h-10 text-white drop-shadow-lg animate-pulse" />
-            <h1 className="text-6xl md:text-7xl font-bold text-white text-shadow-strong">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 hover-scale">
+            <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-lg animate-pulse" />
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white text-shadow-strong">
               WeatherNow
             </h1>
           </div>
-          <p className="text-white/80 text-xl text-shadow-soft">
+          <p className="text-white/80 text-base sm:text-lg md:text-xl text-shadow-soft px-4">
             AI-powered weather insights & forecasts
           </p>
         </motion.div>
@@ -268,16 +267,15 @@ const Index = () => {
           </motion.div>
         )}
 
-        {/* Initial state */}
         {!displayWeatherData && !isLoading && (
-          <div className="glass rounded-3xl p-12 text-center animate-scale-in hover-scale max-w-2xl">
-            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
-              <MapPin className="w-10 h-10 text-white" />
+          <div className="glass rounded-3xl p-6 sm:p-8 md:p-12 text-center animate-scale-in hover-scale max-w-2xl mx-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 animate-pulse">
+              <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 px-2">
               Discover Weather Anywhere
             </h3>
-            <p className="text-white/70 max-w-md">
+            <p className="text-sm sm:text-base text-white/70 max-w-md px-4">
               Search for any city or use your current location to see weather
               conditions with AI-powered insights and 5-day forecasts
             </p>

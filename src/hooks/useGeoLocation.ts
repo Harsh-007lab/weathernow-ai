@@ -27,7 +27,24 @@ export const useGeoLocation = (autoFetch: boolean = false) => {
       return;
     }
 
+    // Check if we're on HTTPS or localhost (required for geolocation on mobile)
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      setState({
+        location: null,
+        error: 'Geolocation requires HTTPS connection',
+        loading: false,
+      });
+      return;
+    }
+
     setState(prev => ({ ...prev, loading: true, error: null }));
+
+    // Mobile-optimized geolocation with better timeout and accuracy settings
+    const options = {
+      enableHighAccuracy: false, // Faster on mobile, uses network location
+      timeout: 15000, // Increased timeout for mobile networks
+      maximumAge: 10 * 60 * 1000, // 10 minutes - more aggressive caching
+    };
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -45,13 +62,13 @@ export const useGeoLocation = (autoFetch: boolean = false) => {
         
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'Location permission denied';
+            errorMessage = 'Please allow location access in your browser settings';
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable';
+            errorMessage = 'Location unavailable. Please check your device settings';
             break;
           case error.TIMEOUT:
-            errorMessage = 'Location request timed out';
+            errorMessage = 'Location request timed out. Please try again';
             break;
         }
 
@@ -61,11 +78,7 @@ export const useGeoLocation = (autoFetch: boolean = false) => {
           loading: false,
         });
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 5 * 60 * 1000, // 5 minutes
-      }
+      options
     );
   };
 

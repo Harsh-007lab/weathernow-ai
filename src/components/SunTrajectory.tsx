@@ -1,4 +1,4 @@
-import { Sun, Sunrise, Sunset } from "lucide-react";
+import { Sun, Sunrise, Sunset, Moon } from "lucide-react";
 
 interface SunTrajectoryProps {
   sunrise: string;
@@ -18,33 +18,40 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
       hours = 0;
     }
     
-    return hours * 60 + minutes; // Return minutes from midnight
+    return hours * 60 + minutes;
   };
 
   const sunriseMinutes = parseTime(sunrise);
   const sunsetMinutes = parseTime(sunset);
   const now = currentTime || new Date().getHours() * 60 + new Date().getMinutes();
+  const dayLength = sunsetMinutes - sunriseMinutes;
+  const midDay = sunriseMinutes + dayLength / 2;
+
+  // Determine if we're in morning (sunrise to midday) or afternoon (midday to sunset)
+  const isMorning = now >= sunriseMinutes && now < midDay;
+  const isAfternoon = now >= midDay && now <= sunsetMinutes;
+  const isDayTime = now >= sunriseMinutes && now <= sunsetMinutes;
+  const isNightBeforeSunrise = now < sunriseMinutes;
+  const isNightAfterSunset = now > sunsetMinutes;
 
   // Calculate sun position percentage (0-100)
   const calculateSunPosition = (): number => {
     if (now < sunriseMinutes) return 0;
     if (now > sunsetMinutes) return 100;
     
-    const dayLength = sunsetMinutes - sunriseMinutes;
     const elapsed = now - sunriseMinutes;
     return (elapsed / dayLength) * 100;
   };
 
   const sunPosition = calculateSunPosition();
-  const isDayTime = now >= sunriseMinutes && now <= sunsetMinutes;
 
-  // Calculate arc path for the sun trajectory
-  const arcPath = () => {
+  // Calculate arc paths - reverse direction for afternoon
+  const getArcPath = (reverse: boolean = false) => {
     const width = 100;
     const height = 30;
-    const startX = 0;
+    const startX = reverse ? 100 : 0;
     const startY = height;
-    const endX = width;
+    const endX = reverse ? 0 : 100;
     const endY = height;
     const controlX = width / 2;
     const controlY = 0;
@@ -53,123 +60,205 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
   };
 
   // Calculate sun position on the arc
-  const getSunPosition = (percentage: number) => {
-    const t = percentage / 100;
+  const getSunPosition = (percentage: number, reverse: boolean = false) => {
+    let t = percentage / 100;
+    if (reverse) t = 1 - t;
+    
     const width = 100;
     const height = 80;
-    const startX = 0;
+    const startX = reverse ? 100 : 0;
     const startY = height;
-    const endX = width;
+    const endX = reverse ? 0 : 100;
     const endY = height;
     const controlX = width / 2;
     const controlY = 0;
     
-    // Quadratic Bezier curve formula
     const x = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * controlX + t * t * endX;
     const y = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * controlY + t * t * endY;
     
     return { x, y };
   };
 
-  const currentSunPos = getSunPosition(sunPosition);
+  const currentSunPos = getSunPosition(sunPosition, isAfternoon);
 
   return (
-    <div className="glass rounded-2xl p-6 col-span-2">
-      <div className="flex items-center gap-3 mb-4">
-        <Sun className="w-6 h-6 text-orange-300" />
-        <span className="text-white/80 font-medium">Sun Position</span>
+    <div className="glass rounded-2xl p-4 sm:p-6 col-span-2 animate-fade-in">
+      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+        {isDayTime ? (
+          <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 animate-pulse" />
+        ) : (
+          <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300 animate-pulse" />
+        )}
+        <span className="text-white/80 font-medium text-sm sm:text-base">
+          {isDayTime ? 'Sun Position' : 'Moon Phase'}
+        </span>
       </div>
       
-      <div className="relative w-full h-32 mb-4">
-        {/* SVG Arc */}
+      <div className="relative w-full h-24 sm:h-32 mb-3 sm:mb-4">
         <svg 
           viewBox="0 0 100 40" 
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full drop-shadow-lg"
           preserveAspectRatio="none"
         >
-          {/* Background arc */}
+          {/* Background arc with glow */}
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            
+            {/* Morning gradient (sunrise to noon) - left to right */}
+            <linearGradient id="morningGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#f97316" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#fbbf24" stopOpacity="1" />
+              <stop offset="100%" stopColor="#facc15" stopOpacity="0.9" />
+            </linearGradient>
+            
+            {/* Afternoon gradient (noon to sunset) - right to left */}
+            <linearGradient id="afternoonGradient" x1="100%" y1="0%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="#f97316" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#fb923c" stopOpacity="1" />
+              <stop offset="100%" stopColor="#c026d3" stopOpacity="0.8" />
+            </linearGradient>
+            
+            {/* Night gradient */}
+            <linearGradient id="nightGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
+              <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity="0.6" />
+            </linearGradient>
+          </defs>
+          
+          {/* Base arc - always visible */}
           <path
-            d={arcPath()}
+            d={getArcPath(false)}
             fill="none"
-            stroke="rgba(255, 255, 255, 0.2)"
-            strokeWidth="0.5"
+            stroke="rgba(255, 255, 255, 0.15)"
+            strokeWidth="1"
+            strokeLinecap="round"
           />
           
-          {/* Progress arc */}
-          {isDayTime && (
+          {/* Animated progress arc */}
+          {isMorning && (
             <path
-              d={arcPath()}
+              d={getArcPath(false)}
               fill="none"
-              stroke="url(#sunGradient)"
-              strokeWidth="0.8"
+              stroke="url(#morningGradient)"
+              strokeWidth="2"
+              strokeLinecap="round"
               strokeDasharray="1000"
               strokeDashoffset={1000 - (sunPosition * 10)}
-              className="transition-all duration-1000"
+              className="transition-all duration-1000 ease-out"
+              filter="url(#glow)"
             />
           )}
           
-          {/* Gradient definition */}
-          <defs>
-            <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#fb923c" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#fbbf24" stopOpacity="1" />
-              <stop offset="100%" stopColor="#fb923c" stopOpacity="0.8" />
-            </linearGradient>
-          </defs>
+          {isAfternoon && (
+            <path
+              d={getArcPath(true)}
+              fill="none"
+              stroke="url(#afternoonGradient)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray="1000"
+              strokeDashoffset={1000 - ((100 - sunPosition) * 10)}
+              className="transition-all duration-1000 ease-out"
+              filter="url(#glow)"
+            />
+          )}
+          
+          {!isDayTime && (
+            <path
+              d={getArcPath(false)}
+              fill="none"
+              stroke="url(#nightGradient)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray="5,5"
+              className="animate-pulse"
+            />
+          )}
         </svg>
         
-        {/* Animated Sun */}
+        {/* Animated Sun/Moon */}
         {isDayTime && (
           <div 
-            className="absolute w-6 h-6 transition-all duration-1000"
+            className="absolute transition-all duration-1000 ease-out"
             style={{
               left: `${currentSunPos.x}%`,
               top: `${currentSunPos.y}%`,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
+              width: 'clamp(1.5rem, 5vw, 2rem)',
+              height: 'clamp(1.5rem, 5vw, 2rem)'
             }}
           >
-            <div className="relative">
-              {/* Opaque background to hide trajectory line */}
-              <div className="absolute inset-0 bg-gradient-to-br from-background to-background/80 rounded-full scale-150 -z-10" />
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-yellow-400 rounded-full blur-md opacity-60 animate-pulse" />
+            <div className="relative w-full h-full">
+              {/* Multi-layer glow effect */}
+              <div className="absolute inset-0 bg-yellow-400/40 rounded-full blur-xl animate-pulse" 
+                   style={{ animationDuration: '3s' }} />
+              <div className="absolute inset-0 bg-orange-400/30 rounded-full blur-lg animate-pulse" 
+                   style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
+              <div className="absolute inset-0 bg-yellow-300/50 rounded-full blur-md" />
+              
               {/* Sun icon */}
-              <Sun className="w-6 h-6 text-yellow-300 relative z-10 drop-shadow-lg" fill="currentColor" />
+              <Sun 
+                className="w-full h-full text-yellow-200 relative z-10 drop-shadow-2xl animate-[spin_20s_linear_infinite]" 
+                fill="currentColor" 
+                strokeWidth={1.5}
+              />
+            </div>
+          </div>
+        )}
+        
+        {!isDayTime && (
+          <div 
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: 'clamp(1.5rem, 5vw, 2rem)',
+              height: 'clamp(1.5rem, 5vw, 2rem)'
+            }}
+          >
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-lg animate-pulse" />
+              <Moon className="w-full h-full text-blue-200 relative z-10" fill="currentColor" />
             </div>
           </div>
         )}
       </div>
       
-      {/* Sunrise and Sunset Times */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-yellow-300 flex items-center justify-center">
-            <Sunrise className="w-5 h-5 text-white" />
+      {/* Sunrise and Sunset Times - Mobile Responsive */}
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-yellow-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <Sunrise className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
           </div>
-          <div>
-            <div className="text-xs text-white/60">Sunrise</div>
-            <div className="text-lg font-bold text-white">{sunrise}</div>
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunrise</div>
+            <div className="text-sm sm:text-lg font-bold text-white truncate">{sunrise}</div>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <div>
-            <div className="text-xs text-white/60 text-right">Sunset</div>
-            <div className="text-lg font-bold text-white text-right">{sunset}</div>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end">
+          <div className="min-w-0 text-right">
+            <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunset</div>
+            <div className="text-sm sm:text-lg font-bold text-white truncate">{sunset}</div>
           </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-400 to-pink-400 flex items-center justify-center">
-            <Sunset className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <Sunset className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
           </div>
         </div>
       </div>
       
-      {/* Current status */}
-      <div className="mt-3 text-center">
-        <div className="text-sm text-white/70">
-          {!isDayTime && now < sunriseMinutes && "Night - Sun will rise soon"}
-          {!isDayTime && now > sunsetMinutes && "Night - Sun has set"}
-          {isDayTime && sunPosition < 50 && "Morning - Sun is rising"}
-          {isDayTime && sunPosition >= 50 && "Afternoon - Sun is setting"}
+      {/* Current status - Mobile Responsive */}
+      <div className="mt-2 sm:mt-3 text-center">
+        <div className="text-xs sm:text-sm text-white/70 px-2">
+          {isNightBeforeSunrise && "🌙 Night — Sunrise approaching"}
+          {isNightAfterSunset && "🌙 Night — Sun has set"}
+          {isMorning && `☀️ Morning — Sun rising (${Math.round(sunPosition)}%)`}
+          {isAfternoon && `🌅 Afternoon — Sun setting (${Math.round(100 - sunPosition)}%)`}
         </div>
       </div>
     </div>
