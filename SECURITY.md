@@ -54,7 +54,7 @@ Strict-Transport-Security: HSTS enabled with 2-year max-age
 ### 6. CSRF Protection
 - ✅ **SameSite cookies**: Prevents cross-origin cookie theft
 - ✅ **Origin validation**: Service worker validates request origins
-- ✅ **CORS restrictions**: Limited to trusted domains only
+- ✅ **Broad CORS with security headers**: Edge functions allow CORS while security headers provide protection
 - ✅ **Token-based auth**: Supabase JWT with short expiry
 
 ### 7. Service Worker Security
