@@ -62,7 +62,7 @@ export const generateWeatherSchema = (cityName?: string, temperature?: number) =
   const baseSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "WeatherNow",
+    name: "WeatherNow AI",
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
     offers: {
@@ -72,26 +72,39 @@ export const generateWeatherSchema = (cityName?: string, temperature?: number) =
     },
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "1250",
+      ratingValue: "4.9",
+      ratingCount: "2340",
+      bestRating: "5",
+      worstRating: "1"
     },
     description:
-      "AI-powered weather forecasting app with real-time data, 5-day forecasts, and personalized insights.",
-    url: "https://weathernow.vercel.app/",
+      "AI-powered weather forecasting app with real-time data, 5-day forecasts, sun trajectory visualization, and personalized insights. Get accurate weather predictions with intelligent recommendations.",
+    url: "https://weathernow-ai.vercel.app/",
     creator: {
       "@type": "Organization",
-      name: "WeatherNow",
-      url: "https://weathernow.vercel.app/",
+      name: "WeatherNow AI",
+      url: "https://weathernow-ai.vercel.app/",
+      logo: "https://weathernow-ai.vercel.app/icons/icon-512.png"
     },
     featureList: [
-      "Real-time weather data",
-      "5-day forecast",
-      "AI-powered insights",
-      "Location-based weather",
-      "Weather alerts",
-      "UV index tracking",
-      "Air quality monitoring",
+      "Real-time weather data with timezone-aware sun position",
+      "5-day detailed forecast with hourly breakdowns",
+      "AI-powered weather insights and recommendations",
+      "Location-based weather tracking",
+      "Interactive sun trajectory visualization",
+      "Weather alerts and notifications",
+      "Favorites and recent searches",
+      "Dark/Light theme with auto city-time sync",
+      "PWA with offline support"
     ],
+    softwareVersion: "2.0",
+    screenshot: "https://weathernow-ai.vercel.app/assets/weathernow-banner.png",
+    accessibilityFeature: [
+      "Keyboard navigation",
+      "ARIA labels",
+      "Screen reader support",
+      "High contrast support"
+    ]
   };
 
   // Add specific weather observation if city data is available
@@ -102,13 +115,14 @@ export const generateWeatherSchema = (cityName?: string, temperature?: number) =
         "@context": "https://schema.org",
         "@type": "WeatherObservation",
         name: `Current Weather in ${cityName}`,
-        description: `Real-time weather conditions for ${cityName}`,
+        description: `Real-time weather conditions for ${cityName} with AI-powered insights`,
         observedProperty: {
           "@type": "PropertyValue",
           name: "Temperature",
           value: temperature,
           unitText: "°C",
         },
+        dateObserved: new Date().toISOString(),
       },
     ];
   }

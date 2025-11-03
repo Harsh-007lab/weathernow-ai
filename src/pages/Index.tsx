@@ -14,7 +14,7 @@ import { useGeoLocation } from "@/hooks/useGeoLocation";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { WeatherCardSkeleton, ForecastCardSkeleton, MetricsSkeleton, InsightsSkeleton } from "@/components/SkeletonLoader";
 import { motion } from "framer-motion";
 import { updateMetaTags, generateWeatherSchema, injectStructuredData } from "@/lib/seo";
 
@@ -159,6 +159,14 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Skip to content link for accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-primary focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        Skip to main content
+      </a>
+
       {/* Animated Background */}
       <WeatherBackground
         condition={displayWeatherData?.condition}
@@ -173,27 +181,28 @@ const Index = () => {
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
         {/* Header */}
-        <div className="absolute top-4 right-4 flex items-center gap-2">
+        <div className="absolute top-4 right-4 flex items-center gap-2" role="navigation" aria-label="Settings">
           <Button
             onClick={manualRefresh}
             variant="ghost"
             size="icon"
             className="glass hover:bg-white/20 border-0"
             disabled={!displayWeatherData}
+            aria-label="Refresh weather data"
           >
-            <RefreshCw className="h-5 w-5 text-white" />
+            <RefreshCw className="h-5 w-5 text-white" aria-hidden="true" />
           </Button>
           <ThemeToggle />
         </div>
 
-        <motion.div
+        <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-12 px-4"
         >
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 hover-scale">
-            <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-lg animate-pulse" />
+            <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-lg animate-pulse" aria-hidden="true" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white text-shadow-strong">
               WeatherNow
             </h1>
@@ -201,7 +210,7 @@ const Index = () => {
           <p className="text-white/80 text-base sm:text-lg md:text-xl text-shadow-soft px-4">
             AI-powered weather insights & forecasts
           </p>
-        </motion.div>
+        </motion.header>
 
         {/* Search and location */}
         <motion.div
@@ -209,6 +218,8 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="flex items-center gap-3 w-full max-w-2xl mb-8"
+          role="search"
+          aria-label="Search for weather"
         >
           <div className="flex-1">
             <SearchBar 
@@ -223,11 +234,12 @@ const Index = () => {
             disabled={geoLoading}
             className="glass hover:bg-white/20 border-0 h-14 px-4"
             size="icon"
+            aria-label={geoLoading ? "Getting your location..." : "Use my current location"}
           >
             {geoLoading ? (
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
+              <Loader2 className="w-5 h-5 text-white animate-spin" aria-hidden="true" />
             ) : (
-              <Navigation className="w-5 h-5 text-white" />
+              <Navigation className="w-5 h-5 text-white" aria-hidden="true" />
             )}
           </Button>
         </motion.div>
@@ -241,33 +253,36 @@ const Index = () => {
         {/* Loading skeletons */}
         {isLoading && (
           <div className="w-full max-w-4xl space-y-6 animate-fade-in">
-            <Skeleton className="w-full h-64 rounded-3xl glass" />
-            <Skeleton className="w-full h-48 rounded-3xl glass" />
-            <Skeleton className="w-full h-96 rounded-3xl glass" />
+            <WeatherCardSkeleton />
+            <MetricsSkeleton />
+            <ForecastCardSkeleton />
           </div>
         )}
 
         {/* Weather content */}
         {displayWeatherData && !isLoading && (
-          <motion.div
+          <motion.main
+            id="main-content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
             className="w-full max-w-4xl space-y-6"
+            role="main"
+            aria-label="Weather information"
           >
             <WeatherCard data={displayWeatherData} />
             
-            <Suspense fallback={<Skeleton className="w-full h-48 rounded-3xl glass" />}>
+            <Suspense fallback={<MetricsSkeleton />}>
               <WeatherMetrics data={displayWeatherData} />
             </Suspense>
             
             {forecastData && (
-              <Suspense fallback={<Skeleton className="w-full h-64 rounded-3xl glass" />}>
+              <Suspense fallback={<ForecastCardSkeleton />}>
                 <ForecastCard forecast={forecastData.daily} />
               </Suspense>
             )}
             
-            <Suspense fallback={<Skeleton className="w-full h-96 rounded-3xl glass" />}>
+            <Suspense fallback={<InsightsSkeleton />}>
               <WeatherInsights
                 temp={displayWeatherData.temp}
                 condition={displayWeatherData.condition}
@@ -275,7 +290,7 @@ const Index = () => {
                 windSpeed={displayWeatherData.windSpeed}
               />
             </Suspense>
-          </motion.div>
+          </motion.main>
         )}
 
         {!displayWeatherData && !isLoading && (

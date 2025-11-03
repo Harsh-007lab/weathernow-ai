@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useFavorites } from "@/hooks/useFavorites";
+import confetti from "canvas-confetti";
 
 interface CityOption {
   name: string;
@@ -198,9 +199,20 @@ export const SearchBar = ({ onSearch, isLoading = false, currentCity, currentCou
   // Handle favorite toggle
   const handleFavoriteToggle = useCallback(() => {
     if (currentCity) {
+      const wasNotFavorite = !isFavorite(currentCity);
       toggleFavorite(currentCity, currentCountry || undefined);
+      
+      // Confetti effect when adding to favorites
+      if (wasNotFavorite) {
+        confetti({
+          particleCount: 50,
+          spread: 70,
+          origin: { y: 0.3 },
+          colors: ['#ef4444', '#f87171', '#fca5a5'],
+        });
+      }
     }
-  }, [currentCity, currentCountry, toggleFavorite]);
+  }, [currentCity, currentCountry, toggleFavorite, isFavorite]);
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto mb-8 animate-slide-down relative" ref={searchRef}>
