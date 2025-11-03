@@ -1,12 +1,13 @@
 {
-  "name": "WeatherNow - AI Weather App",
-  "short_name": "WeatherNow",
-  "description": "Beautiful AI-powered weather forecasts and insights",
+  "name": "WeatherNow AI - Smart Weather Forecasts",
+  "short_name": "WeatherNow AI",
+  "description": "AI-powered weather app with real-time forecasts, sun trajectory, and intelligent insights. Works offline!",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0EA5E9",
-  "theme_color": "#0EA5E9",
+  "background_color": "#1e293b",
+  "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -21,12 +22,23 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["weather", "lifestyle", "utilities"],
+  "categories": ["weather", "utilities", "productivity"],
   "screenshots": [
     {
-      "src": "/placeholder.svg",
-      "sizes": "540x720",
-      "type": "image/svg+xml"
+      "src": "/assets/weathernow-banner.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View performance metrics",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
 }

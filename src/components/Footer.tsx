@@ -35,6 +35,12 @@ export const Footer = () => {
                   Features
                 </Link>
                 <Link
+                  to="/dashboard"
+                  className="block text-white/70 hover:text-white text-sm transition-colors"
+                >
+                  Performance Dashboard
+                </Link>
+                <Link
                   to="/privacy"
                   className="block text-white/70 hover:text-white text-sm transition-colors"
                 >
@@ -70,8 +76,11 @@ export const Footer = () => {
           </div>
 
           <div className="border-t border-white/20 pt-6 text-center">
-            <p className="text-white/60 text-sm">
-              © {new Date().getFullYear()} WeatherNow. All rights reserved.
+            <p className="text-white/60 text-sm mb-2">
+              © {new Date().getFullYear()} WeatherNow AI. All rights reserved.
+            </p>
+            <p className="text-white/50 text-xs">
+              Proprietary Software — Unauthorized copying, modification, or redistribution is strictly prohibited.
             </p>
           </div>
         </div>

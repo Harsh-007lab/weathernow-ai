@@ -5,7 +5,9 @@ import { WeatherParticles } from "@/components/WeatherParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { TemperatureToggle } from "@/components/TemperatureToggle";
 import { useTheme } from "@/context/ThemeContext";
+import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { useToast } from "@/hooks/use-toast";
@@ -33,9 +35,10 @@ const citySchema = z
 
 const Index = () => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [mode, setMode] = useState<"city" | "location">("city"); // 👈 mode switch
+  const [mode, setMode] = useState<"city" | "location">("city");
   const { toast } = useToast();
   const { setCityTime } = useTheme();
+  const { convertTemp, getUnitSymbol } = useTemperatureUnit();
 
   // Geolocation hook
   const { location, loading: geoLoading, error: geoError, fetchLocation } =
@@ -182,6 +185,7 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
         {/* Header */}
         <div className="absolute top-4 right-4 flex items-center gap-2" role="navigation" aria-label="Settings">
+          <TemperatureToggle />
           <Button
             onClick={manualRefresh}
             variant="ghost"
@@ -270,7 +274,15 @@ const Index = () => {
             role="main"
             aria-label="Weather information"
           >
-            <WeatherCard data={displayWeatherData} />
+            <WeatherCard 
+              data={{
+                ...displayWeatherData,
+                temp: convertTemp(displayWeatherData.temp),
+                minTemp: convertTemp(displayWeatherData.minTemp),
+                maxTemp: convertTemp(displayWeatherData.maxTemp),
+              }}
+              tempUnit={getUnitSymbol()}
+            />
             
             <Suspense fallback={<MetricsSkeleton />}>
               <WeatherMetrics data={displayWeatherData} />

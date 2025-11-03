@@ -21,6 +21,15 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
     return hours * 60 + minutes;
   };
 
+  // Format minutes to readable time
+  const formatTime24 = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60) % 24;
+    const mins = minutes % 60;
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+  };
+
   const sunriseMinutes = parseTime(sunrise);
   const sunsetMinutes = parseTime(sunset);
   
@@ -28,18 +37,31 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
   const now = currentLocalTime 
     ? new Date(currentLocalTime * 1000).getUTCHours() * 60 + new Date(currentLocalTime * 1000).getUTCMinutes()
     : new Date().getHours() * 60 + new Date().getMinutes();
+  
   const dayLength = sunsetMinutes - sunriseMinutes;
   const midDay = sunriseMinutes + dayLength / 2;
 
-  // Determine if we're in morning (sunrise to midday) or afternoon (midday to sunset)
+  // Determine time of day
   const isMorning = now >= sunriseMinutes && now < midDay;
   const isAfternoon = now >= midDay && now <= sunsetMinutes;
   const isDayTime = now >= sunriseMinutes && now <= sunsetMinutes;
   const isNightBeforeSunrise = now < sunriseMinutes;
   const isNightAfterSunset = now > sunsetMinutes;
 
-  // Calculate sun position percentage (0-100)
-  const calculateSunPosition = (): number => {
+  // Calculate sun/moon position percentage (0-100)
+  const calculatePosition = (): number => {
+    if (isNightBeforeSunrise) {
+      // Night before sunrise: 0% at midnight, approaching sunrise
+      const minutesUntilSunrise = sunriseMinutes - now;
+      const totalNightBeforeSunrise = sunriseMinutes; // From midnight to sunrise
+      return Math.max(0, 100 - (minutesUntilSunrise / totalNightBeforeSunrise) * 100);
+    }
+    if (isNightAfterSunset) {
+      // Night after sunset: progress from sunset toward midnight
+      const minutesSinceSunset = now - sunsetMinutes;
+      const totalNightAfterSunset = (24 * 60) - sunsetMinutes; // From sunset to midnight
+      return Math.min(100, (minutesSinceSunset / totalNightAfterSunset) * 100);
+    }
     if (now < sunriseMinutes) return 0;
     if (now > sunsetMinutes) return 100;
     
@@ -47,7 +69,7 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
     return (elapsed / dayLength) * 100;
   };
 
-  const sunPosition = calculateSunPosition();
+  const sunPosition = calculatePosition();
 
   // Calculate arc paths - reverse direction for afternoon
   const getArcPath = (reverse: boolean = false) => {
@@ -174,15 +196,29 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
             />
           )}
           
-          {!isDayTime && (
+          {isNightBeforeSunrise && (
             <path
               d={getArcPath(false)}
               fill="none"
               stroke="url(#nightGradient)"
               strokeWidth="1.5"
               strokeLinecap="round"
-              strokeDasharray="5,5"
-              className="animate-pulse"
+              strokeDasharray="1000"
+              strokeDashoffset={1000 - (sunPosition * 10)}
+              className="transition-all duration-1000 ease-out opacity-70"
+            />
+          )}
+          
+          {isNightAfterSunset && (
+            <path
+              d={getArcPath(true)}
+              fill="none"
+              stroke="url(#nightGradient)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray="1000"
+              strokeDashoffset={1000 - (sunPosition * 10)}
+              className="transition-all duration-1000 ease-out opacity-70"
             />
           )}
         </svg>
@@ -219,15 +255,20 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
         
         {!isDayTime && (
           <div 
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            className="absolute transition-all duration-1000 ease-out"
             style={{
+              left: `${currentSunPos.x}%`,
+              top: `${currentSunPos.y}%`,
+              transform: 'translate(-50%, -50%)',
               width: 'clamp(1.5rem, 5vw, 2rem)',
               height: 'clamp(1.5rem, 5vw, 2rem)'
             }}
           >
             <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-lg animate-pulse" />
-              <Moon className="w-full h-full text-blue-200 relative z-10" fill="currentColor" />
+              <div className="absolute inset-0 bg-blue-400/30 rounded-full blur-lg animate-pulse" 
+                   style={{ animationDuration: '4s' }} />
+              <div className="absolute inset-0 bg-indigo-400/20 rounded-full blur-md" />
+              <Moon className="w-full h-full text-blue-100 relative z-10 drop-shadow-xl" fill="currentColor" />
             </div>
           </div>
         )}
@@ -259,8 +300,8 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
       {/* Current status - Mobile Responsive */}
       <div className="mt-2 sm:mt-3 text-center">
         <div className="text-xs sm:text-sm text-white/70 px-2">
-          {isNightBeforeSunrise && "🌙 Night — Sunrise approaching"}
-          {isNightAfterSunset && "🌙 Night — Sun has set"}
+          {isNightBeforeSunrise && `🌙 Night — ${formatTime24(now)} until sunrise`}
+          {isNightAfterSunset && `🌙 Night — ${formatTime24(now)} after sunset`}
           {isMorning && `☀️ Morning — Sun rising (${Math.round(sunPosition)}%)`}
           {isAfternoon && `🌅 Afternoon — Sun setting (${Math.round(100 - sunPosition)}%)`}
         </div>

@@ -6,32 +6,40 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://weathernow.vercel.app/</loc>
-    <lastmod>2025-11-01</lastmod>
+    <loc>https://weathernow-ai.vercel.app/</loc>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   
+  <!-- Dashboard Page -->
+  <url>
+    <loc>https://weathernow-ai.vercel.app/dashboard</loc>
+    <lastmod>2025-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
   <!-- About Page -->
   <url>
-    <loc>https://weathernow.vercel.app/about</loc>
-    <lastmod>2025-11-01</lastmod>
+    <loc>https://weathernow-ai.vercel.app/about</loc>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Features Page -->
   <url>
-    <loc>https://weathernow.vercel.app/features</loc>
-    <lastmod>2025-11-01</lastmod>
+    <loc>https://weathernow-ai.vercel.app/features</loc>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Privacy Page -->
   <url>
-    <loc>https://weathernow.vercel.app/privacy</loc>
-    <lastmod>2025-11-01</lastmod>
+    <loc>https://weathernow-ai.vercel.app/privacy</loc>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

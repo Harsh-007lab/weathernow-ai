@@ -18,9 +18,10 @@ interface WeatherData {
 
 interface WeatherCardProps {
   data: WeatherData;
+  tempUnit?: string;
 }
 
-export const WeatherCard = ({ data }: WeatherCardProps) => {
+export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
   const getWeatherIcon = (condition: string) => {
     const conditionLower = condition.toLowerCase();
     
@@ -61,18 +62,18 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
           </div>
           
           <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-4 text-shadow-strong animate-scale-in" style={{animationDelay: '0.2s'}}>
-            {data.temp}°
+            {data.temp}{tempUnit}
           </div>
           
           <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90 animate-slide-up" style={{animationDelay: '0.3s'}}>
             <div className="text-center">
               <div className="text-xs sm:text-sm opacity-75">High</div>
-              <div className="text-xl sm:text-2xl font-semibold">{data.maxTemp}°</div>
+              <div className="text-xl sm:text-2xl font-semibold">{data.maxTemp}{tempUnit}</div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-white/30" />
             <div className="text-center">
               <div className="text-xs sm:text-sm opacity-75">Low</div>
-              <div className="text-xl sm:text-2xl font-semibold">{data.minTemp}°</div>
+              <div className="text-xl sm:text-2xl font-semibold">{data.minTemp}{tempUnit}</div>
             </div>
           </div>
         </div>
