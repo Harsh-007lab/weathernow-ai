@@ -16,6 +16,8 @@ export interface WeatherData {
   feelsLike: number;
   pressure: number;
   visibility: number;
+  timezone: number; // Timezone offset in seconds
+  currentLocalTime: number; // Current time in city's timezone (Unix timestamp)
   uv?: number;
   airQuality?: number;
 }

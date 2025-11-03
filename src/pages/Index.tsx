@@ -5,6 +5,7 @@ import { WeatherParticles } from "@/components/WeatherParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { WeatherCard } from "@/components/WeatherCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/context/ThemeContext";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +35,7 @@ const Index = () => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [mode, setMode] = useState<"city" | "location">("city"); // 👈 mode switch
   const { toast } = useToast();
+  const { setCityTime } = useTheme();
 
   // Geolocation hook
   const { location, loading: geoLoading, error: geoError, fetchLocation } =
@@ -119,9 +121,18 @@ const Index = () => {
 
   const isDaytime = useMemo(() => {
     if (!displayWeatherData) return true;
-    const currentHour = new Date().getHours();
+    // Use city's local time to determine day/night
+    const localDate = new Date(displayWeatherData.currentLocalTime * 1000);
+    const currentHour = localDate.getUTCHours();
     return currentHour >= 6 && currentHour < 20;
   }, [displayWeatherData]);
+
+  // Update theme context when city daytime status changes
+  useEffect(() => {
+    if (displayWeatherData) {
+      setCityTime(isDaytime);
+    }
+  }, [isDaytime, displayWeatherData, setCityTime]);
 
   // Update SEO when weather data changes
   useEffect(() => {

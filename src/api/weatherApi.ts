@@ -48,6 +48,10 @@ export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => 
   const minTemp = weatherData.main.temp_min !== undefined ? Math.round(weatherData.main.temp_min) : Math.round(weatherData.main.temp - 2);
   const maxTemp = weatherData.main.temp_max !== undefined ? Math.round(weatherData.main.temp_max) : Math.round(weatherData.main.temp + 2);
 
+  // Calculate current local time in the city's timezone
+  const now = Date.now() / 1000; // Current UTC time in seconds
+  const currentLocalTime = Math.floor(now + weatherData.timezone);
+
   return {
     city: sanitizeCityName(weatherData.name),
     country: weatherData.sys.country,
@@ -62,6 +66,8 @@ export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => 
     feelsLike: Math.round(weatherData.main.feels_like),
     pressure: weatherData.main.pressure,
     visibility: Math.round(weatherData.visibility / 1000), // Convert to km
+    timezone: weatherData.timezone,
+    currentLocalTime,
   };
 };
 
@@ -88,6 +94,10 @@ export const fetchWeatherByCoords = async (lat: number, lon: number): Promise<We
   const minTemp = weatherData.main.temp_min !== undefined ? Math.round(weatherData.main.temp_min) : Math.round(weatherData.main.temp - 2);
   const maxTemp = weatherData.main.temp_max !== undefined ? Math.round(weatherData.main.temp_max) : Math.round(weatherData.main.temp + 2);
 
+  // Calculate current local time in the city's timezone
+  const now = Date.now() / 1000; // Current UTC time in seconds
+  const currentLocalTime = Math.floor(now + weatherData.timezone);
+
   return {
     city: sanitizeCityName(weatherData.name),
     country: weatherData.sys.country,
@@ -102,6 +112,8 @@ export const fetchWeatherByCoords = async (lat: number, lon: number): Promise<We
     feelsLike: Math.round(weatherData.main.feels_like),
     pressure: weatherData.main.pressure,
     visibility: Math.round(weatherData.visibility / 1000),
+    timezone: weatherData.timezone,
+    currentLocalTime,
   };
 };
 

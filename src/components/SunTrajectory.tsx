@@ -3,10 +3,10 @@ import { Sun, Sunrise, Sunset, Moon } from "lucide-react";
 interface SunTrajectoryProps {
   sunrise: string;
   sunset: string;
-  currentTime?: number;
+  currentLocalTime?: number; // Unix timestamp in city's local timezone
 }
 
-export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryProps) => {
+export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajectoryProps) => {
   // Parse time strings (format: "HH:MM AM/PM")
   const parseTime = (timeStr: string): number => {
     const [time, period] = timeStr.split(' ');
@@ -23,7 +23,11 @@ export const SunTrajectory = ({ sunrise, sunset, currentTime }: SunTrajectoryPro
 
   const sunriseMinutes = parseTime(sunrise);
   const sunsetMinutes = parseTime(sunset);
-  const now = currentTime || new Date().getHours() * 60 + new Date().getMinutes();
+  
+  // Use city's local time if provided, otherwise fallback to user's local time
+  const now = currentLocalTime 
+    ? new Date(currentLocalTime * 1000).getUTCHours() * 60 + new Date(currentLocalTime * 1000).getUTCMinutes()
+    : new Date().getHours() * 60 + new Date().getMinutes();
   const dayLength = sunsetMinutes - sunriseMinutes;
   const midDay = sunriseMinutes + dayLength / 2;
 

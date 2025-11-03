@@ -12,6 +12,8 @@ interface WeatherData {
   windSpeed: number;
   sunrise: string;
   sunset: string;
+  currentLocalTime: number;
+  timezone: number;
 }
 
 interface WeatherCardProps {
@@ -116,7 +118,11 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
         </div>
 
         {/* Sun Trajectory - Spans 2 columns */}
-        <SunTrajectory sunrise={data.sunrise} sunset={data.sunset} />
+        <SunTrajectory 
+          sunrise={data.sunrise} 
+          sunset={data.sunset} 
+          currentLocalTime={data.currentLocalTime}
+        />
       </div>
     </div>
   );
