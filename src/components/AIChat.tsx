@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { WeatherData } from '@/types/weather';
 import { motion, AnimatePresence } from 'framer-motion';
+import { z } from 'zod';
+import { sanitizeText } from '@/lib/sanitize';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,6 +19,13 @@ interface Message {
 interface AIChatProps {
   weatherData: WeatherData | null;
 }
+
+const MessageSchema = z.object({
+  message: z.string()
+    .min(1, 'Message cannot be empty')
+    .max(500, 'Message must be less than 500 characters')
+    .transform(sanitizeText)
+});
 
 export const AIChat = ({ weatherData }: AIChatProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +37,18 @@ export const AIChat = ({ weatherData }: AIChatProps) => {
   const handleSend = async () => {
     if (!input.trim() || !weatherData) return;
 
-    const userMessage = input.trim();
+    // Validate and sanitize input
+    const validation = MessageSchema.safeParse({ message: input.trim() });
+    if (!validation.success) {
+      toast({
+        title: "Invalid message",
+        description: validation.error.errors[0]?.message || "Please enter a valid message",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const userMessage = validation.data.message;
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
