@@ -95,7 +95,7 @@ export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
         <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-left" style={{'--stagger-delay': 1} as any}>
           <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300 animate-pulse-glow" />
+              <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300" />
               <span className="text-white/80 font-medium text-sm sm:text-base">Humidity</span>
             </div>
             <MetricInfoDialog title="Humidity" description={metricDescriptions.humidity} preferredPlacement="left" />
@@ -113,7 +113,7 @@ export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
         <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-right" style={{'--stagger-delay': 2} as any}>
           <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300 animate-pulse-glow" />
+              <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300" />
               <span className="text-white/80 font-medium text-sm sm:text-base">Wind</span>
             </div>
             <MetricInfoDialog title="Wind Speed" description={metricDescriptions.windSpeed} preferredPlacement="right" />

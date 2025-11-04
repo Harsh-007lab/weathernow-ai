@@ -19,7 +19,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 1} as any}>
           <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Thermometer className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <Thermometer className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
               <span className="text-white/70 text-xs sm:text-sm">Feels Like</span>
             </div>
             <MetricInfoDialog title="Feels Like" description={metricDescriptions.feelsLike} preferredPlacement="left" />
@@ -31,7 +31,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 2} as any}>
           <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
               <span className="text-white/70 text-xs sm:text-sm">Pressure</span>
             </div>
             <MetricInfoDialog title="Pressure" description={metricDescriptions.pressure} preferredPlacement="right" />
@@ -43,7 +43,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 3} as any}>
           <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
               <span className="text-white/70 text-xs sm:text-sm">Visibility</span>
             </div>
             <MetricInfoDialog title="Visibility" description={metricDescriptions.visibility} preferredPlacement="left" />
@@ -55,7 +55,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 4} as any}>
           <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
               <span className="text-white/70 text-xs sm:text-sm">Wind Speed</span>
             </div>
             <MetricInfoDialog title="Wind Speed" description={metricDescriptions.windSpeed} preferredPlacement="right" />

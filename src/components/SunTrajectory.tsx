@@ -257,27 +257,53 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
         )}
       </div>
       
-      {/* Sunrise and Sunset Times - Mobile Responsive */}
+      {/* Sunrise and Sunset Times - Mobile Responsive - Swap for nighttime */}
       <div className="flex justify-between items-center gap-2">
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-yellow-400 flex items-center justify-center flex-shrink-0 shadow-lg">
-            <Sunrise className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunrise</div>
-            <div className="text-sm sm:text-lg font-bold text-white truncate">{sunrise}</div>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end">
-          <div className="min-w-0 text-right">
-            <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunset</div>
-            <div className="text-sm sm:text-lg font-bold text-white truncate">{sunset}</div>
-          </div>
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-400 flex items-center justify-center flex-shrink-0 shadow-lg">
-            <Sunset className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
-          </div>
-        </div>
+        {isDayTime ? (
+          <>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-yellow-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sunrise className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunrise</div>
+                <div className="text-sm sm:text-lg font-bold text-white truncate">{sunrise}</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end">
+              <div className="min-w-0 text-right">
+                <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunset</div>
+                <div className="text-sm sm:text-lg font-bold text-white truncate">{sunset}</div>
+              </div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sunset className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sunset className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunset</div>
+                <div className="text-sm sm:text-lg font-bold text-white truncate">{sunset}</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end">
+              <div className="min-w-0 text-right">
+                <div className="text-[10px] sm:text-xs text-white/60 truncate">Sunrise</div>
+                <div className="text-sm sm:text-lg font-bold text-white truncate">{sunrise}</div>
+              </div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-yellow-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sunrise className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+              </div>
+            </div>
+          </>
+        )}
       </div>
       
       {/* Current status - Mobile Responsive */}
