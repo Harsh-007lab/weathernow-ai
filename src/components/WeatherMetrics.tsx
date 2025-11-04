@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Eye, Gauge, Thermometer, Wind } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
-import { MetricInfo, metricDescriptions } from './MetricInfo';
+import { MetricInfoDialog, metricDescriptions } from './MetricInfoDialog';
 
 interface WeatherMetricsProps {
   data: WeatherData;
@@ -22,7 +22,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
               <Thermometer className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
               <span className="text-white/70 text-xs sm:text-sm">Feels Like</span>
             </div>
-            <MetricInfo title="Feels Like" description={metricDescriptions.feelsLike} position="left" />
+            <MetricInfoDialog title="Feels Like" description={metricDescriptions.feelsLike} preferredPlacement="left" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.feelsLike}°C</p>
         </div>
@@ -34,7 +34,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
               <span className="text-white/70 text-xs sm:text-sm">Pressure</span>
             </div>
-            <MetricInfo title="Pressure" description={metricDescriptions.pressure} position="right" />
+            <MetricInfoDialog title="Pressure" description={metricDescriptions.pressure} preferredPlacement="right" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.pressure} hPa</p>
         </div>
@@ -46,7 +46,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
               <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
               <span className="text-white/70 text-xs sm:text-sm">Visibility</span>
             </div>
-            <MetricInfo title="Visibility" description={metricDescriptions.visibility} position="left" />
+            <MetricInfoDialog title="Visibility" description={metricDescriptions.visibility} preferredPlacement="left" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.visibility} km</p>
         </div>
@@ -58,7 +58,7 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
               <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
               <span className="text-white/70 text-xs sm:text-sm">Wind Speed</span>
             </div>
-            <MetricInfo title="Wind Speed" description={metricDescriptions.windSpeed} position="right" />
+            <MetricInfoDialog title="Wind Speed" description={metricDescriptions.windSpeed} preferredPlacement="right" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.windSpeed} m/s</p>
         </div>
