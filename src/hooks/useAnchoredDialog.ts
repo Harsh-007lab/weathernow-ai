@@ -33,42 +33,65 @@ export const useAnchoredDialog = (options: UseAnchoredDialogOptions = {}) => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const dialogWidth = dialogRect.width || 288; // Default width
-    const dialogHeight = dialogRect.height || 120; // Estimated height
+    const dialogHeight = dialogRect.height || 150; // Increased estimated height
+    
+    // Find parent card to position below it
+    let parentCard = anchor.closest('[class*="bg-white/10"], [class*="glass"]');
+    const parentRect = parentCard?.getBoundingClientRect();
 
     let placement = preferredPlacement;
     let top = 0;
     let left = 0;
+    
+    // Enhanced offset for better spacing
+    const enhancedOffset = offset + 8;
 
     // Calculate bottom placement
     if (placement === 'bottom') {
-      top = anchorRect.bottom + offset;
-      left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+      // If inside a card, position below the card instead of the button
+      if (parentRect) {
+        top = parentRect.bottom + enhancedOffset;
+        left = parentRect.left + (parentRect.width / 2) - (dialogWidth / 2);
+      } else {
+        top = anchorRect.bottom + enhancedOffset;
+        left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+      }
 
       // Check if dialog fits below
-      if (top + dialogHeight > viewportHeight - 16) {
+      if (top + dialogHeight > viewportHeight - 24) {
         placement = 'top';
       }
     }
 
     // Calculate top placement
     if (placement === 'top') {
-      top = anchorRect.top - dialogHeight - offset;
-      left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+      // If inside a card, position above the card
+      if (parentRect) {
+        top = parentRect.top - dialogHeight - enhancedOffset;
+        left = parentRect.left + (parentRect.width / 2) - (dialogWidth / 2);
+      } else {
+        top = anchorRect.top - dialogHeight - enhancedOffset;
+        left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+      }
 
       // Check if dialog fits above
-      if (top < 16) {
+      if (top < 24) {
         placement = 'bottom';
-        top = anchorRect.bottom + offset;
+        if (parentRect) {
+          top = parentRect.bottom + enhancedOffset;
+        } else {
+          top = anchorRect.bottom + enhancedOffset;
+        }
       }
     }
 
     // Calculate left placement
     if (placement === 'left') {
       top = anchorRect.top + (anchorRect.height / 2) - (dialogHeight / 2);
-      left = anchorRect.left - dialogWidth - offset;
+      left = anchorRect.left - dialogWidth - enhancedOffset;
 
       // Check if dialog fits to the left
-      if (left < 16) {
+      if (left < 24) {
         placement = 'right';
       }
     }
@@ -76,21 +99,32 @@ export const useAnchoredDialog = (options: UseAnchoredDialogOptions = {}) => {
     // Calculate right placement
     if (placement === 'right') {
       top = anchorRect.top + (anchorRect.height / 2) - (dialogHeight / 2);
-      left = anchorRect.right + offset;
+      left = anchorRect.right + enhancedOffset;
 
       // Check if dialog fits to the right
-      if (left + dialogWidth > viewportWidth - 16) {
-        placement = 'bottom';
-        top = anchorRect.bottom + offset;
-        left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+      if (left + dialogWidth > viewportWidth - 24) {
+        placement = 'left';
+        left = anchorRect.left - dialogWidth - enhancedOffset;
+        
+        // If still doesn't fit, fallback to bottom
+        if (left < 24) {
+          placement = 'bottom';
+          if (parentRect) {
+            top = parentRect.bottom + enhancedOffset;
+            left = parentRect.left + (parentRect.width / 2) - (dialogWidth / 2);
+          } else {
+            top = anchorRect.bottom + enhancedOffset;
+            left = anchorRect.left + (anchorRect.width / 2) - (dialogWidth / 2);
+          }
+        }
       }
     }
 
-    // Clamp horizontal position to viewport
-    left = Math.max(16, Math.min(left, viewportWidth - dialogWidth - 16));
+    // Clamp horizontal position to viewport with better margins
+    left = Math.max(24, Math.min(left, viewportWidth - dialogWidth - 24));
     
-    // Clamp vertical position to viewport
-    top = Math.max(16, Math.min(top, viewportHeight - dialogHeight - 16));
+    // Clamp vertical position to viewport with better margins
+    top = Math.max(24, Math.min(top, viewportHeight - dialogHeight - 24));
 
     return { top, left, placement };
   }, [preferredPlacement, offset]);
