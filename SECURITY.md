@@ -109,7 +109,7 @@ If you discover a security vulnerability, please report it responsibly:
 
 1. **DO NOT** create a public GitHub issue
 2. **DO NOT** exploit the vulnerability
-3. Email: security@weathernow.app (replace with actual email)
+3. Email:
 4. Include:
    - Description of the vulnerability
    - Steps to reproduce
