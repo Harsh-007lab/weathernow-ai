@@ -124,9 +124,13 @@ const Index = () => {
 
   const isDaytime = useMemo(() => {
     if (!displayWeatherData) return true;
-    // Use city's local time to determine day/night
+    
+    // Calculate city's actual local time using timezone offset
+    // currentLocalTime is already adjusted (UTC + timezone offset)
     const localDate = new Date(displayWeatherData.currentLocalTime * 1000);
     const currentHour = localDate.getUTCHours();
+    
+    // Consider it daytime from 6 AM to 8 PM local time
     return currentHour >= 6 && currentHour < 20;
   }, [displayWeatherData]);
 

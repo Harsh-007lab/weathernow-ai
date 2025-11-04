@@ -33,10 +33,17 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
   const sunriseMinutes = parseTime(sunrise);
   const sunsetMinutes = parseTime(sunset);
   
-  // Use city's local time if provided, otherwise fallback to user's local time
-  const now = currentLocalTime 
-    ? new Date(currentLocalTime * 1000).getUTCHours() * 60 + new Date(currentLocalTime * 1000).getUTCMinutes()
-    : new Date().getHours() * 60 + new Date().getMinutes();
+  // Calculate current time in minutes using city's local time
+  // currentLocalTime is already adjusted for timezone (UTC + timezone offset)
+  let now: number;
+  if (currentLocalTime) {
+    // Extract hours and minutes from the local timestamp
+    const localDate = new Date(currentLocalTime * 1000);
+    now = localDate.getUTCHours() * 60 + localDate.getUTCMinutes();
+  } else {
+    // Fallback to user's local time
+    now = new Date().getHours() * 60 + new Date().getMinutes();
+  }
   
   const dayLength = sunsetMinutes - sunriseMinutes;
   const midDay = sunriseMinutes + dayLength / 2;
@@ -223,7 +230,7 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
           )}
         </svg>
         
-        {/* Animated Sun/Moon */}
+        {/* Animated Sun/Moon with enhanced glow effects */}
         {isDayTime && (
           <div 
             className="absolute transition-all duration-1000 ease-out"
@@ -236,11 +243,12 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
             }}
           >
             <div className="relative w-full h-full">
-              {/* Multi-layer glow effect */}
-              <div className="absolute inset-0 bg-yellow-400/40 rounded-full blur-xl animate-pulse" 
+              {/* Enhanced multi-layer golden glow effect */}
+              <div className="absolute inset-0 bg-yellow-400/50 rounded-full blur-2xl animate-pulse" 
                    style={{ animationDuration: '3s' }} />
-              <div className="absolute inset-0 bg-orange-400/30 rounded-full blur-lg animate-pulse" 
+              <div className="absolute inset-0 bg-orange-400/40 rounded-full blur-xl animate-pulse" 
                    style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
+              <div className="absolute inset-0 bg-amber-300/60 rounded-full blur-lg" />
               <div className="absolute inset-0 bg-yellow-300/50 rounded-full blur-md" />
               
               {/* Sun icon */}
@@ -265,9 +273,12 @@ export const SunTrajectory = ({ sunrise, sunset, currentLocalTime }: SunTrajecto
             }}
           >
             <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-blue-400/30 rounded-full blur-lg animate-pulse" 
+              {/* Enhanced blue moon glow effect */}
+              <div className="absolute inset-0 bg-blue-400/40 rounded-full blur-xl animate-pulse" 
                    style={{ animationDuration: '4s' }} />
-              <div className="absolute inset-0 bg-indigo-400/20 rounded-full blur-md" />
+              <div className="absolute inset-0 bg-sky-400/30 rounded-full blur-lg animate-pulse"
+                   style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
+              <div className="absolute inset-0 bg-indigo-400/25 rounded-full blur-md" />
               <Moon className="w-full h-full text-blue-100 relative z-10 drop-shadow-xl" fill="currentColor" />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Eye, Gauge, Thermometer, Wind } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
+import { MetricInfo, metricDescriptions } from './MetricInfo';
 
 interface WeatherMetricsProps {
   data: WeatherData;
@@ -16,36 +17,48 @@ export const WeatherMetrics = ({ data }: WeatherMetricsProps) => {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 stagger-children">
         {/* Feels Like */}
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 1} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-            <Thermometer className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
-            <span className="text-white/70 text-xs sm:text-sm">Feels Like</span>
+          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Thermometer className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <span className="text-white/70 text-xs sm:text-sm">Feels Like</span>
+            </div>
+            <MetricInfo title="Feels Like" description={metricDescriptions.feelsLike} position="left" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.feelsLike}°C</p>
         </div>
 
         {/* Pressure */}
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 2} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-            <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
-            <span className="text-white/70 text-xs sm:text-sm">Pressure</span>
+          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <span className="text-white/70 text-xs sm:text-sm">Pressure</span>
+            </div>
+            <MetricInfo title="Pressure" description={metricDescriptions.pressure} position="right" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.pressure} hPa</p>
         </div>
 
         {/* Visibility */}
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 3} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-            <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
-            <span className="text-white/70 text-xs sm:text-sm">Visibility</span>
+          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <span className="text-white/70 text-xs sm:text-sm">Visibility</span>
+            </div>
+            <MetricInfo title="Visibility" description={metricDescriptions.visibility} position="left" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.visibility} km</p>
         </div>
 
         {/* Wind Speed */}
         <div className="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 animate-scale-in" style={{'--stagger-delay': 4} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-            <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
-            <span className="text-white/70 text-xs sm:text-sm">Wind Speed</span>
+          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 animate-pulse-glow" />
+              <span className="text-white/70 text-xs sm:text-sm">Wind Speed</span>
+            </div>
+            <MetricInfo title="Wind Speed" description={metricDescriptions.windSpeed} position="right" />
           </div>
           <p className="text-lg sm:text-2xl font-bold text-white">{data.windSpeed} m/s</p>
         </div>

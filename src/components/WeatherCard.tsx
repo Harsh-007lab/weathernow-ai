@@ -1,5 +1,6 @@
 import { Cloud, CloudRain, CloudSnow, Sun, CloudDrizzle, CloudLightning, Wind, Droplets } from "lucide-react";
 import { SunTrajectory } from "./SunTrajectory";
+import { MetricInfo, metricDescriptions } from "./MetricInfo";
 
 interface WeatherData {
   city: string;
@@ -61,18 +62,27 @@ export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
             {getWeatherIcon(data.condition)}
           </div>
           
-          <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-4 text-shadow-strong animate-scale-in" style={{animationDelay: '0.2s'}}>
-            {data.temp}{tempUnit}
+          <div className="flex items-center justify-center gap-2 animate-scale-in" style={{animationDelay: '0.2s'}}>
+            <div className="text-6xl sm:text-7xl md:text-8xl font-bold text-white text-shadow-strong">
+              {data.temp}{tempUnit}
+            </div>
+            <MetricInfo title="Temperature" description={metricDescriptions.temperature} position="right" />
           </div>
           
-          <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90 animate-slide-up" style={{animationDelay: '0.3s'}}>
+          <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/90 animate-slide-up mt-4" style={{animationDelay: '0.3s'}}>
             <div className="text-center">
-              <div className="text-xs sm:text-sm opacity-75">High</div>
+              <div className="flex items-center justify-center gap-1 text-xs sm:text-sm opacity-75 mb-1">
+                <span>High</span>
+                <MetricInfo title="Maximum Temperature" description={metricDescriptions.maxTemp} position="top" />
+              </div>
               <div className="text-xl sm:text-2xl font-semibold">{data.maxTemp}{tempUnit}</div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-white/30" />
             <div className="text-center">
-              <div className="text-xs sm:text-sm opacity-75">Low</div>
+              <div className="flex items-center justify-center gap-1 text-xs sm:text-sm opacity-75 mb-1">
+                <span>Low</span>
+                <MetricInfo title="Minimum Temperature" description={metricDescriptions.minTemp} position="top" />
+              </div>
               <div className="text-xl sm:text-2xl font-semibold">{data.minTemp}{tempUnit}</div>
             </div>
           </div>
@@ -83,9 +93,12 @@ export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 stagger-children">
         {/* Humidity */}
         <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-left" style={{'--stagger-delay': 1} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300 animate-pulse-glow" />
-            <span className="text-white/80 font-medium text-sm sm:text-base">Humidity</span>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-300 animate-pulse-glow" />
+              <span className="text-white/80 font-medium text-sm sm:text-base">Humidity</span>
+            </div>
+            <MetricInfo title="Humidity" description={metricDescriptions.humidity} position="left" />
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-white">{data.humidity}%</div>
           <div className="mt-3 bg-white/20 rounded-full h-2 overflow-hidden">
@@ -98,9 +111,12 @@ export const WeatherCard = ({ data, tempUnit = '°C' }: WeatherCardProps) => {
 
         {/* Wind Speed */}
         <div className="glass rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl card-glow animate-slide-in-right" style={{'--stagger-delay': 2} as any}>
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300 animate-pulse-glow" />
-            <span className="text-white/80 font-medium text-sm sm:text-base">Wind</span>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Wind className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300 animate-pulse-glow" />
+              <span className="text-white/80 font-medium text-sm sm:text-base">Wind</span>
+            </div>
+            <MetricInfo title="Wind Speed" description={metricDescriptions.windSpeed} position="right" />
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-white">{data.windSpeed} m/s</div>
           <div className="mt-3 flex gap-1">

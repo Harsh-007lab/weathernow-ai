@@ -27,6 +27,7 @@ const formatTime = (timestamp: number, timezoneOffset: number = 0): string => {
 
 /**
  * Fetch current weather data by city name
+ * Now fetches forecast data to get accurate min/max temperatures
  */
 export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => {
   const sanitizedCity = sanitizeCityName(city);
@@ -34,19 +35,45 @@ export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => 
     throw new Error('Invalid city name');
   }
 
-  const { data, error } = await supabase.functions.invoke('weather-proxy', {
-    body: { type: 'weather-by-city', city: sanitizedCity }
-  });
+  // Fetch both current weather and forecast in parallel
+  const [currentResult, forecastResult] = await Promise.all([
+    supabase.functions.invoke('weather-proxy', {
+      body: { type: 'weather-by-city', city: sanitizedCity }
+    }),
+    supabase.functions.invoke('weather-proxy', {
+      body: { type: 'forecast', city: sanitizedCity }
+    })
+  ]);
 
-  if (error) {
-    throw new Error(error.message || 'Failed to fetch weather data');
+  if (currentResult.error) {
+    throw new Error(currentResult.error.message || 'Failed to fetch weather data');
   }
 
-  const weatherData: OpenWeatherResponse = data;
+  const weatherData: OpenWeatherResponse = currentResult.data;
   
-  // Get actual min/max from the API response
-  const minTemp = weatherData.main.temp_min !== undefined ? Math.round(weatherData.main.temp_min) : Math.round(weatherData.main.temp - 2);
-  const maxTemp = weatherData.main.temp_max !== undefined ? Math.round(weatherData.main.temp_max) : Math.round(weatherData.main.temp + 2);
+  // Get accurate min/max from forecast data (today's forecast)
+  let minTemp = Math.round(weatherData.main.temp);
+  let maxTemp = Math.round(weatherData.main.temp);
+  
+  if (!forecastResult.error && forecastResult.data) {
+    const forecastData: OpenWeatherForecastResponse = forecastResult.data;
+    
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    // Filter forecast items for today
+    const todayForecasts = forecastData.list.filter(item => {
+      const itemDate = item.dt_txt.split(' ')[0];
+      return itemDate === todayStr;
+    });
+    
+    if (todayForecasts.length > 0) {
+      const todayTemps = todayForecasts.map(f => f.main.temp);
+      minTemp = Math.round(Math.min(...todayTemps));
+      maxTemp = Math.round(Math.max(...todayTemps));
+    }
+  }
 
   // Calculate current local time in the city's timezone
   const now = Date.now() / 1000; // Current UTC time in seconds
@@ -73,6 +100,7 @@ export const fetchWeatherByCity = async (city: string): Promise<WeatherData> => 
 
 /**
  * Fetch current weather data by coordinates
+ * Now fetches forecast data to get accurate min/max temperatures
  */
 export const fetchWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData> => {
   // Validate coordinates
@@ -80,19 +108,45 @@ export const fetchWeatherByCoords = async (lat: number, lon: number): Promise<We
     throw new Error('Invalid coordinates');
   }
 
-  const { data, error } = await supabase.functions.invoke('weather-proxy', {
-    body: { type: 'weather-by-coords', lat, lon }
-  });
+  // Fetch both current weather and forecast in parallel
+  const [currentResult, forecastResult] = await Promise.all([
+    supabase.functions.invoke('weather-proxy', {
+      body: { type: 'weather-by-coords', lat, lon }
+    }),
+    supabase.functions.invoke('weather-proxy', {
+      body: { type: 'forecast-by-coords', lat, lon }
+    })
+  ]);
 
-  if (error) {
-    throw new Error(error.message || 'Failed to fetch weather data');
+  if (currentResult.error) {
+    throw new Error(currentResult.error.message || 'Failed to fetch weather data');
   }
 
-  const weatherData: OpenWeatherResponse = data;
+  const weatherData: OpenWeatherResponse = currentResult.data;
   
-  // Get actual min/max from the API response
-  const minTemp = weatherData.main.temp_min !== undefined ? Math.round(weatherData.main.temp_min) : Math.round(weatherData.main.temp - 2);
-  const maxTemp = weatherData.main.temp_max !== undefined ? Math.round(weatherData.main.temp_max) : Math.round(weatherData.main.temp + 2);
+  // Get accurate min/max from forecast data (today's forecast)
+  let minTemp = Math.round(weatherData.main.temp);
+  let maxTemp = Math.round(weatherData.main.temp);
+  
+  if (!forecastResult.error && forecastResult.data) {
+    const forecastData: OpenWeatherForecastResponse = forecastResult.data;
+    
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    // Filter forecast items for today
+    const todayForecasts = forecastData.list.filter(item => {
+      const itemDate = item.dt_txt.split(' ')[0];
+      return itemDate === todayStr;
+    });
+    
+    if (todayForecasts.length > 0) {
+      const todayTemps = todayForecasts.map(f => f.main.temp);
+      minTemp = Math.round(Math.min(...todayTemps));
+      maxTemp = Math.round(Math.max(...todayTemps));
+    }
+  }
 
   // Calculate current local time in the city's timezone
   const now = Date.now() / 1000; // Current UTC time in seconds

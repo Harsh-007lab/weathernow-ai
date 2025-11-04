@@ -30,6 +30,12 @@ const ForecastSchema = z.object({
   city: z.string().trim().min(1).max(100),
 });
 
+const ForecastByCoordsSchema = z.object({
+  type: z.literal('forecast-by-coords'),
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+});
+
 const CitySuggestionsSchema = z.object({
   type: z.literal('city-suggestions'),
   query: z.string().trim().min(2).max(100),
@@ -39,6 +45,7 @@ const RequestSchema = z.discriminatedUnion('type', [
   WeatherByCitySchema,
   WeatherByCoordsSchema,
   ForecastSchema,
+  ForecastByCoordsSchema,
   CitySuggestionsSchema,
 ]);
 
@@ -100,6 +107,9 @@ serve(async (req) => {
         break;
       case 'forecast':
         apiUrl = `${BASE_URL}/data/2.5/forecast?q=${encodeURIComponent(validatedInput.city)}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+        break;
+      case 'forecast-by-coords':
+        apiUrl = `${BASE_URL}/data/2.5/forecast?lat=${validatedInput.lat}&lon=${validatedInput.lon}&appid=${OPENWEATHER_API_KEY}&units=metric`;
         break;
       case 'city-suggestions':
         apiUrl = `${BASE_URL}/geo/1.0/direct?q=${encodeURIComponent(validatedInput.query)}&limit=5&appid=${OPENWEATHER_API_KEY}`;
