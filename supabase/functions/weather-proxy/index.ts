@@ -121,10 +121,12 @@ serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('OpenWeather API error:', response.status, data);
+      if (isDev) {
+        console.error('OpenWeather API error:', response.status, data);
+      }
       return new Response(
-        JSON.stringify({ error: data.message || 'Weather API error' }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Unable to fetch weather data. Please try again.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -134,15 +136,18 @@ serve(async (req) => {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
+      if (isDev) {
+        console.error('Validation error:', error.errors);
+      }
       return new Response(
-        JSON.stringify({ error: 'Invalid request format', details: error.errors }),
+        JSON.stringify({ error: 'Invalid request data' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.error('Error in weather-proxy:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'An error occurred while processing your request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

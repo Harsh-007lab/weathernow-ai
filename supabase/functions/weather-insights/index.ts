@@ -103,19 +103,22 @@ Keep responses concise, friendly, and actionable.`;
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "Too many requests. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }),
+          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      throw new Error(`AI Gateway error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ error: 'Unable to generate weather insights. Please try again.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
@@ -153,8 +156,11 @@ Keep responses concise, friendly, and actionable.`;
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
+      if (isDev) {
+        console.error('Validation error:', error.errors);
+      }
       return new Response(
-        JSON.stringify({ error: 'Invalid weather data', details: error.errors }),
+        JSON.stringify({ error: 'Invalid weather data provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -165,7 +171,7 @@ Keep responses concise, friendly, and actionable.`;
     });
     
     return new Response(
-      JSON.stringify({ error: "Unable to generate insights" }),
+      JSON.stringify({ error: "An error occurred while generating insights" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
