@@ -32,37 +32,37 @@ const Privacy = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-950">
-      <header className="container mx-auto px-4 py-6">
+      <header className="container mx-auto px-4 sm:px-6 py-6">
         <Link to="/">
-          <Button variant="ghost" className="gap-2">
+          <Button variant="ghost" className="gap-2 hover:bg-white/10">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Button>
         </Link>
       </header>
 
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-center mb-12">
-            <Shield className="w-16 h-16 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <div className="text-center mb-12 sm:mb-16">
+            <Shield className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
               Privacy Policy
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
               Last updated: November 1, 2025
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg space-y-8">
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8 sm:space-y-10 border border-gray-200/50 dark:border-gray-700/50">
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                 Our Commitment to Privacy
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
                 At WeatherNow, your privacy is paramount. We believe you should
                 have control over your data, which is why we've designed our
                 service to collect minimal information and respect your privacy
@@ -71,13 +71,13 @@ const Privacy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-white">
                 Information We Collect
               </h2>
-              <div className="space-y-4 text-gray-700 dark:text-gray-300">
+              <div className="space-y-5 sm:space-y-6 text-gray-700 dark:text-gray-300">
                 <div>
-                  <h3 className="font-semibold mb-2">Location Data</h3>
-                  <p className="leading-relaxed">
+                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white">Location Data</h3>
+                  <p className="text-sm sm:text-base leading-relaxed">
                     When you use location services, we access your approximate
                     location only to provide weather information. This data is
                     never stored on our servers and is only used temporarily to

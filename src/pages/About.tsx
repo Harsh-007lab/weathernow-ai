@@ -64,58 +64,58 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-950">
-      <header className="container mx-auto px-4 py-6">
+      <header className="container mx-auto px-4 sm:px-6 py-6">
         <Link to="/">
-          <Button variant="ghost" className="gap-2">
+          <Button variant="ghost" className="gap-2 hover:bg-white/10">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Button>
         </Link>
       </header>
 
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
             About WeatherNow
           </h1>
 
-          <section className="mb-12">
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+          <section className="mb-12 sm:mb-16 space-y-6">
+            <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
               WeatherNow is more than just a weather app—it's your intelligent
               companion for staying ahead of changing conditions. We combine
               cutting-edge artificial intelligence with real-time meteorological
               data from trusted sources to deliver the most accurate forecasts
               and personalized insights.
             </p>
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
               Whether you're planning your day, preparing for a trip, or simply
               curious about the weather, WeatherNow provides the information you
               need in a beautiful, intuitive interface.
             </p>
           </section>
 
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
+          <section className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 sm:mb-10 text-gray-900 dark:text-white">
               What Makes Us Different
             </h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
+                  className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-200/50 dark:border-gray-700/50"
                 >
-                  <feature.icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+                  <feature.icon className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400 mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold mb-3 text-gray-900 dark:text-white">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -123,15 +123,20 @@ const About = () => {
             </div>
           </section>
 
-          <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
-            <p className="text-lg leading-relaxed">
+          <motion.section 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-white shadow-2xl"
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">Our Mission</h2>
+            <p className="text-base sm:text-lg leading-relaxed text-white/95">
               To make weather forecasting accessible, accurate, and actionable
               for everyone. We believe that with the right information and
               insights, you can make better decisions and live more confidently,
               no matter what the weather brings.
             </p>
-          </section>
+          </motion.section>
         </motion.div>
       </main>
     </div>

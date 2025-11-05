@@ -10,11 +10,13 @@ import { useTheme } from "@/context/ThemeContext";
 import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
+import { ContactForm } from "@/components/ContactForm";
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import { MapPin, Loader2, Navigation, RefreshCw } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
+import { MapPin, Loader2, Navigation, RefreshCw, Heart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WeatherCardSkeleton, ForecastCardSkeleton, MetricsSkeleton, InsightsSkeleton } from "@/components/SkeletonLoader";
 import { motion } from "framer-motion";
@@ -36,9 +38,11 @@ const citySchema = z
 const Index = () => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [mode, setMode] = useState<"city" | "location">("city");
+  const [showFavorites, setShowFavorites] = useState(false);
   const { toast } = useToast();
   const { setCityTime } = useTheme();
   const { convertTemp, getUnitSymbol } = useTemperatureUnit();
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
   // Geolocation hook
   const { location, loading: geoLoading, error: geoError, fetchLocation } =
@@ -203,6 +207,22 @@ const Index = () => {
           <ThemeToggle />
         </div>
 
+        {/* Favorites Toggle Button */}
+        {favorites.length > 0 && (
+          <div className="absolute top-4 left-4">
+            <Button
+              onClick={() => setShowFavorites(!showFavorites)}
+              variant="ghost"
+              className="glass hover:bg-white/20 border-0 gap-2"
+              aria-label="Toggle favorites"
+            >
+              <Star className={`h-5 w-5 ${showFavorites ? 'fill-yellow-400 text-yellow-400' : 'text-white'}`} />
+              <span className="text-white font-medium hidden sm:inline">Favorites</span>
+              <span className="text-white/70 text-sm">({favorites.length})</span>
+            </Button>
+          </div>
+        )}
+
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -253,10 +273,51 @@ const Index = () => {
         </motion.div>
 
         {/* Favorites Panel */}
-        <FavoritesPanel 
-          onCityClick={handleSearch} 
-          currentCity={displayWeatherData?.city}
-        />
+        {showFavorites && (
+          <FavoritesPanel 
+            onCityClick={(city) => {
+              handleSearch(city);
+              setShowFavorites(false);
+            }} 
+            currentCity={displayWeatherData?.city}
+          />
+        )}
+
+        {/* Favorite Button - Show when viewing a city */}
+        {displayWeatherData && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex justify-center mb-4"
+          >
+            <Button
+              onClick={() => {
+                if (displayWeatherData.city) {
+                  toggleFavorite(displayWeatherData.city, displayWeatherData.country);
+                  toast({
+                    title: isFavorite(displayWeatherData.city) ? "Removed from favorites" : "Added to favorites ⭐",
+                    description: isFavorite(displayWeatherData.city) 
+                      ? `${displayWeatherData.city} removed` 
+                      : `${displayWeatherData.city} saved to favorites`,
+                  });
+                }
+              }}
+              variant="ghost"
+              className="glass hover:bg-white/20 border-0 gap-2"
+            >
+              <Heart 
+                className={`h-5 w-5 transition-all ${
+                  isFavorite(displayWeatherData.city || '') 
+                    ? 'fill-red-400 text-red-400 animate-pulse' 
+                    : 'text-white'
+                }`} 
+              />
+              <span className="text-white font-medium">
+                {isFavorite(displayWeatherData.city || '') ? 'Saved' : 'Save City'}
+              </span>
+            </Button>
+          </motion.div>
+        )}
 
         {/* Loading skeletons */}
         {isLoading && (
@@ -323,6 +384,11 @@ const Index = () => {
             </p>
           </div>
         )}
+      </div>
+
+      {/* Contact Form */}
+      <div className="relative z-10 px-4 pb-8">
+        <ContactForm />
       </div>
 
       {/* Footer */}
