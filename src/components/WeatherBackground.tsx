@@ -27,7 +27,7 @@ export const WeatherBackground = ({ condition = "Clear", isDaytime = true }: Wea
     const conditionLower = condition.toLowerCase();
     
     if (!isDaytime) {
-      return "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900";
+      return "bg-gradient-to-br from-[#0a1628] via-[#0f2744] to-[#1a3a5c]";
     }
     
     if (conditionLower.includes("clear") || conditionLower.includes("sunny")) {

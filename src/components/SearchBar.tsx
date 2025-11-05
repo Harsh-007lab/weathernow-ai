@@ -319,8 +319,11 @@ export const SearchBar = ({ onSearch, isLoading = false, currentCity, currentCou
                     >
                       <Clock className="w-4 h-4 text-white/60 flex-shrink-0" />
                       <div 
-                        className="flex-1 flex items-center justify-between"
-                        onClick={() => handleRecentClick(item.city)}
+                        className="flex-1 flex items-center justify-between cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRecentClick(item.city);
+                        }}
                       >
                         <span className="font-medium">{item.city}</span>
                         <span className="text-xs text-white/40 ml-2">{formatTimestamp(item.timestamp)}</span>
@@ -356,18 +359,21 @@ export const SearchBar = ({ onSearch, isLoading = false, currentCity, currentCou
                   )}
                 </>
               ) : (
-                displayList.items.map((suggestion, index) => (
-                  <li
-                    key={`${suggestion.lat}-${suggestion.lon}-${index}`}
-                    id={`suggestion-${index}`}
-                    role="option"
-                    aria-selected={selectedIndex === index}
-                    onClick={() => handleSelectSuggestion(suggestion)}
-                    className={`px-4 py-3 cursor-pointer transition-all duration-200 flex items-center gap-3 text-white hover:translate-x-1 animate-fade-in ${
-                      selectedIndex === index ? "bg-white/20" : "hover:bg-white/10"
-                    }`}
-                    style={{animationDelay: `${index * 50}ms`}}
-                  >
+                  displayList.items.map((suggestion, index) => (
+                    <li
+                      key={`${suggestion.lat}-${suggestion.lon}-${index}`}
+                      id={`suggestion-${index}`}
+                      role="option"
+                      aria-selected={selectedIndex === index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectSuggestion(suggestion);
+                      }}
+                      className={`px-4 py-3 cursor-pointer transition-all duration-200 flex items-center gap-3 text-white hover:translate-x-1 animate-fade-in ${
+                        selectedIndex === index ? "bg-white/20" : "hover:bg-white/10"
+                      }`}
+                      style={{animationDelay: `${index * 50}ms`}}
+                    >
                     <span className="text-xl flex-shrink-0">{getCountryFlag(suggestion.country)}</span>
                     <div className="flex-1">
                       <div className="font-medium">

@@ -22,7 +22,7 @@ export const useTemperatureUnit = () => {
     if (unit === 'fahrenheit') {
       return Math.round((temp * 9/5) + 32);
     }
-    return temp;
+    return Math.round(temp);
   }, [unit]);
 
   const getUnitSymbol = useCallback((): string => {
