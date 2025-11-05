@@ -2,7 +2,7 @@
 
 ## WeatherNow Security Features
 
-WeatherNow implements **military-grade security** across all layers to protect against common web vulnerabilities and cyberattacks.
+WeatherNow implements comprehensive security best practices to protect against common web vulnerabilities and ensure safe operation as a public weather service.
 
 ---
 
@@ -28,7 +28,7 @@ WeatherNow implements **military-grade security** across all layers to protect a
 - Forecast requests
 
 ### 3. Rate Limiting & DDoS Protection
-- ✅ **IP-based throttling**: 100 requests/minute for weather, 30 requests/minute for AI
+- ✅ **IP-based throttling**: 100 requests/minute for weather, 30 requests/minute for AI, 5 requests/hour for contact form
 - ✅ **Automatic blocking**: Temporary ban on rate limit violations
 - ✅ **Request debouncing**: 300ms delay on search inputs
 - ✅ **Cache-first strategy**: Reduces API load and prevents abuse
@@ -52,10 +52,9 @@ Strict-Transport-Security: HSTS enabled with 2-year max-age
 - ✅ **Sanitization library**: Custom sanitize functions for all user inputs
 
 ### 6. CSRF Protection
-- ✅ **SameSite cookies**: Prevents cross-origin cookie theft
+- ✅ **CORS restrictions**: Edge functions restricted to specific domains (weathernow-ai.vercel.app, *.lovable.app, *.lovable.dev)
 - ✅ **Origin validation**: Service worker validates request origins
-- ✅ **Broad CORS with security headers**: Edge functions allow CORS while security headers provide protection
-- ✅ **Token-based auth**: Supabase JWT with short expiry
+- ✅ **Request validation**: All requests validated with Zod schemas
 
 ### 7. Service Worker Security
 - ✅ **Origin whitelist**: Only caches requests from trusted domains
@@ -71,16 +70,15 @@ Strict-Transport-Security: HSTS enabled with 2-year max-age
 - ✅ **Code splitting**: Reduces attack surface by chunking code
 
 ### 9. Authentication & Authorization
-- ✅ **JWT tokens**: Supabase authentication with secure token storage
-- ✅ **Row-Level Security (RLS)**: Database-level access control (when tables exist)
-- ✅ **Session expiry**: Automatic logout after inactivity
-- ✅ **Secure cookie settings**: HttpOnly, Secure, SameSite flags
+- ⚠️ **No authentication system**: WeatherNow is a public service - no user accounts or authentication required
+- ✅ **Public by design**: Intentional design choice for instant weather access
+- ✅ **IP-based rate limiting**: Prevents abuse without requiring user accounts
 
 ### 10. Data Privacy
-- ✅ **localStorage encryption consideration**: Favorites/history stored locally (non-sensitive)
-- ✅ **No PII storage**: No personal identifiable information collected
-- ✅ **GDPR compliant**: Minimal data collection, user controls
-- ✅ **Privacy-first design**: No tracking, no analytics by default
+- ✅ **localStorage only**: Favorites and search history stored locally (non-sensitive data only)
+- ✅ **No PII collection**: No personal identifiable information collected or stored
+- ✅ **No server-side user data**: No user profiles, accounts, or tracking
+- ✅ **Privacy-first design**: No third-party analytics or tracking scripts
 
 ---
 
@@ -90,16 +88,16 @@ Strict-Transport-Security: HSTS enabled with 2-year max-age
 
 | Vulnerability | Status | Mitigation |
 |--------------|--------|------------|
-| A01: Broken Access Control | ✅ Protected | RLS policies, JWT tokens |
-| A02: Cryptographic Failures | ✅ Protected | HTTPS only, secure headers |
-| A03: Injection | ✅ Protected | Input validation, parameterized queries |
-| A04: Insecure Design | ✅ Protected | Security-first architecture |
-| A05: Security Misconfiguration | ✅ Protected | Hardened headers, strict CSP |
-| A06: Vulnerable Components | ✅ Protected | Regular dependency updates |
-| A07: Auth & Identity Failures | ✅ Protected | Supabase auth, JWT tokens |
-| A08: Data Integrity Failures | ✅ Protected | Input validation, sanitization |
-| A09: Logging & Monitoring | ⚠️ Partial | Edge function logging enabled |
-| A10: Server-Side Request Forgery | ✅ Protected | URL validation, origin checks |
+| A01: Broken Access Control | ⚠️ N/A | No authentication system (public service by design) |
+| A02: Cryptographic Failures | ✅ Protected | HTTPS only via Supabase/Vercel |
+| A03: Injection | ✅ Protected | Zod validation, no raw SQL, sanitized inputs |
+| A04: Insecure Design | ✅ Protected | Security-first architecture with input validation |
+| A05: Security Misconfiguration | ✅ Protected | CORS restrictions, generic error messages |
+| A06: Vulnerable Components | ✅ Protected | Regular dependency updates via Lovable |
+| A07: Auth & Identity Failures | ⚠️ N/A | No authentication system implemented |
+| A08: Data Integrity Failures | ✅ Protected | Comprehensive input validation and sanitization |
+| A09: Logging & Monitoring | ⚠️ Partial | Edge function logging enabled, no alerting |
+| A10: Server-Side Request Forgery | ✅ Protected | URL validation, CORS restrictions |
 
 ---
 
@@ -152,16 +150,29 @@ We regularly audit and update our security measures:
 ## 🏆 Security Achievements
 
 ✅ No API keys exposed in client code  
-✅ All user inputs sanitized and validated  
-✅ Rate limiting prevents abuse  
-✅ OWASP Top 10 compliant  
-✅ Military-grade headers implemented  
-✅ Zero XSS vulnerabilities  
-✅ Zero SQL injection risks  
-✅ Service worker hardened against attacks  
+✅ All user inputs sanitized and validated with Zod  
+✅ IP-based rate limiting prevents abuse  
+✅ CORS restricted to specific domains  
+✅ Email header injection prevention  
+✅ Generic error messages (no information leakage)  
+✅ React JSX provides XSS protection  
+✅ No raw SQL queries (Supabase client methods only)  
 
 ---
 
-**Last Updated:** 2025-11-02  
-**Security Version:** 1.0.0  
-**Maintained by:** WeatherNow Security Team
+## ⚠️ Limitations
+
+As a public weather service, WeatherNow has intentional limitations:
+
+- **No user authentication**: Anyone can access the service (by design for instant weather access)
+- **IP-based rate limiting only**: Rate limits can be circumvented with VPN/proxy rotation
+- **Public endpoints**: All edge functions are publicly accessible
+- **Client-side storage**: Favorites and search history stored in browser localStorage (non-sensitive only)
+
+These limitations are acceptable for a public weather information service with no sensitive user data.
+
+---
+
+**Last Updated:** 2025-11-05  
+**Security Version:** 2.0.0  
+**Maintained by:** WeatherNow Development Team

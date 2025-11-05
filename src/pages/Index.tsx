@@ -10,7 +10,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
-import { ContactForm } from "@/components/ContactForm";
+
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
@@ -386,10 +386,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Contact Form */}
-      <div className="relative z-10 px-4 pb-8">
-        <ContactForm />
-      </div>
 
       {/* Footer */}
       <Footer />
