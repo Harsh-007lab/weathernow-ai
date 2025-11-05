@@ -7,11 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactSchema = z.object({
-  name: z.string().trim().max(100, "Name must be less than 100 characters").optional(),
+  name: z.string().trim().max(100, "Name must be less than 100 characters")
+    .transform(val => val?.replace(/[\r\n]/g, '') || '')
+    .optional(),
   email: z.string().trim().email("Please enter a valid email").max(255, "Email must be less than 255 characters"),
-  message: z.string().trim().min(1, "Message is required").max(1000, "Message must be less than 1000 characters"),
+  message: z.string().trim().min(1, "Message is required").max(1000, "Message must be less than 1000 characters")
+    .transform(val => val.replace(/[\r\n]/g, '')),
 });
 
 export const ContactForm = () => {
@@ -29,26 +33,19 @@ export const ContactForm = () => {
       
       setIsSubmitting(true);
 
-      // Using Web3Forms - no API key needed for basic usage
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: "fbd93cba-7e33-4c98-8d25-ea79dc2e26db", // Public demo key - replace with your own from web3forms.com
-          subject: "New WeatherNow Contact Form Submission",
-          from_name: validated.name || "WeatherNow User",
+      // Call edge function to send email securely
+      const { data, error: functionError } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          name: validated.name || "WeatherNow User",
           email: validated.email,
           message: validated.message,
-          to_email: "rai3451768@gmail.com",
-        }),
+        },
       });
 
-      const data = await response.json();
+      if (functionError) throw functionError;
+      if (data?.error) throw new Error(data.error);
 
-      if (data.success) {
+      if (data?.success) {
         setIsSuccess(true);
         setFormData({ name: "", email: "", message: "" });
         toast({
