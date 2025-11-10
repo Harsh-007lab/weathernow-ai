@@ -10,6 +10,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
+import { AdSense } from "@/components/AdSense";
 
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
@@ -352,6 +353,12 @@ const Index = () => {
             <Suspense fallback={<MetricsSkeleton />}>
               <WeatherMetrics data={displayWeatherData} />
             </Suspense>
+
+            {/* Ad below main weather card */}
+            <AdSense 
+              className="my-6"
+              style={{ minHeight: '120px', maxWidth: '100%' }}
+            />
             
             {forecastData && (
               <Suspense fallback={<ForecastCardSkeleton />}>
@@ -367,22 +374,37 @@ const Index = () => {
                 windSpeed={displayWeatherData.windSpeed}
               />
             </Suspense>
+
+            {/* Ad before footer */}
+            <AdSense 
+              className="mt-6 mb-4"
+              style={{ minHeight: '100px', maxWidth: '100%' }}
+            />
           </motion.main>
         )}
 
         {!displayWeatherData && !isLoading && (
-          <div className="glass rounded-3xl p-6 sm:p-8 md:p-12 text-center animate-scale-in hover-scale max-w-2xl mx-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 animate-pulse">
-              <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          <>
+            <div className="glass rounded-3xl p-6 sm:p-8 md:p-12 text-center animate-scale-in hover-scale max-w-2xl mx-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 animate-pulse">
+                <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 px-2">
+                Discover Weather Anywhere
+              </h3>
+              <p className="text-sm sm:text-base text-white/70 max-w-md px-4">
+                Search for any city or use your current location to see weather
+                conditions with AI-powered insights and 5-day forecasts
+              </p>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 px-2">
-              Discover Weather Anywhere
-            </h3>
-            <p className="text-sm sm:text-base text-white/70 max-w-md px-4">
-              Search for any city or use your current location to see weather
-              conditions with AI-powered insights and 5-day forecasts
-            </p>
-          </div>
+
+            {/* Banner ad on landing view */}
+            <div className="w-full max-w-2xl mt-6 mx-4">
+              <AdSense 
+                style={{ minHeight: '100px', maxWidth: '100%' }}
+              />
+            </div>
+          </>
         )}
       </div>
 
