@@ -14,7 +14,7 @@ const Privacy = () => {
         "Learn how WeatherNow protects your privacy. We don't store location data, respect your privacy, and comply with GDPR and data protection regulations.",
       keywords:
         "privacy policy, data protection, GDPR, weather app privacy, location privacy",
-      url: "https://weathernow.vercel.app/privacy",
+      url: "https://weathernow-ai.vercel.app/privacy",
     });
 
     // Structured Data
@@ -53,154 +53,198 @@ const Privacy = () => {
               Privacy Policy
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              Last updated: November 1, 2025
+              Last updated: November 10, 2025
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Website: WeatherNow (https://weathernow-ai.vercel.app/)
             </p>
           </div>
 
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8 sm:space-y-10 border border-gray-200/50 dark:border-gray-700/50">
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Our Commitment to Privacy
-              </h2>
               <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-                At WeatherNow, your privacy is paramount. We believe you should
-                have control over your data, which is why we've designed our
-                service to collect minimal information and respect your privacy
-                at every step.
+                WeatherNow respects your privacy. This policy explains what information we collect, how we use it, and how we protect it.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-white">
-                Information We Collect
+                1. Information We Collect
               </h2>
               <div className="space-y-5 sm:space-y-6 text-gray-700 dark:text-gray-300">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white">Location Data</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white">a) Location Data</h3>
                   <p className="text-sm sm:text-base leading-relaxed">
-                    When you use location services, we access your approximate
-                    location only to provide weather information. This data is
-                    never stored on our servers and is only used temporarily to
-                    fetch weather data.
+                    If you allow location access, we use your device's coordinates only to display weather information. We do not store, track, or share your location.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Search Queries</h3>
-                  <p className="leading-relaxed">
-                    City names you search for are used only to retrieve weather
-                    information and are not stored or associated with your
-                    identity.
+                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white">b) Search History & Favorites</h3>
+                  <p className="text-sm sm:text-base leading-relaxed">
+                    We may store the cities you search or mark as favorites locally on your device to improve your experience. This data is not sent to our servers unless account sync is enabled later.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Analytics</h3>
-                  <p className="leading-relaxed">
-                    We use privacy-focused analytics to understand how our
-                    service is used and improve the experience. This data is
-                    anonymized and never contains personally identifiable
-                    information.
+                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white">c) Email (Contact / Suggestions Form)</h3>
+                  <p className="text-sm sm:text-base leading-relaxed">
+                    If you submit feedback or contact us, we store your email to respond. We never sell or share email data.
                   </p>
                 </div>
               </div>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                How We Use Your Information
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                2. How We Use Your Information
               </h2>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                <li>To provide accurate weather forecasts for your location</li>
-                <li>To respond to your AI chat queries</li>
-                <li>To improve and optimize our service</li>
-                <li>To ensure the security of our application</li>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                We use data to:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                <li>Provide accurate weather data</li>
+                <li>Improve app performance and speed</li>
+                <li>Respond to user suggestions</li>
+                <li>Personalize the experience (favorites, theme, location option)</li>
               </ul>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+                We do not sell personal data or track users across websites.
+              </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Third-Party Services
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-white">
+                3. Third-Party Services
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                We use OpenWeather API to fetch weather data. When you request
-                weather information, your location or searched city is sent to
-                OpenWeather's servers. Please review{" "}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm sm:text-base text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-300 dark:border-gray-600">
+                      <th className="py-2 px-3 font-semibold text-gray-900 dark:text-white">Service</th>
+                      <th className="py-2 px-3 font-semibold text-gray-900 dark:text-white">Purpose</th>
+                      <th className="py-2 px-3 font-semibold text-gray-900 dark:text-white">Policy Link</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-700 dark:text-gray-300">
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <td className="py-3 px-3">OpenWeather API</td>
+                      <td className="py-3 px-3">Weather data</td>
+                      <td className="py-3 px-3">
+                        <a
+                          href="https://openweathermap.org/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                        >
+                          Privacy Policy
+                        </a>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <td className="py-3 px-3">Supabase</td>
+                      <td className="py-3 px-3">Secure backend and routing</td>
+                      <td className="py-3 px-3">
+                        <a
+                          href="https://supabase.com/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                        >
+                          Privacy Policy
+                        </a>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <td className="py-3 px-3">Google AdSense</td>
+                      <td className="py-3 px-3">Ads display and relevance</td>
+                      <td className="py-3 px-3">
+                        <a
+                          href="https://policies.google.com/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                        >
+                          Privacy Policy
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+                Ads may use cookies to show relevant ads. Users can opt out of personalized ads here:{" "}
                 <a
-                  href="https://openweather.co.uk/privacy-policy"
+                  href="https://www.google.com/settings/ads"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-blue-600 dark:text-blue-400 hover:underline break-all"
                 >
-                  OpenWeather's Privacy Policy
-                </a>{" "}
-                for more information.
+                  https://www.google.com/settings/ads
+                </a>
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Data Security
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                4. Cookies
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                All communications between your device and our servers are
-                encrypted using industry-standard SSL/TLS protocols. We
-                implement security best practices to protect against
-                unauthorized access.
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+                We use cookies only to:
               </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Your Rights
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                You have the right to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                <li>Access any personal data we may hold</li>
-                <li>Request deletion of your data</li>
-                <li>Opt-out of analytics tracking</li>
-                <li>Withdraw consent for location services at any time</li>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-3">
+                <li>Remember theme mode</li>
+                <li>Improve loading speed</li>
+                <li>Store recent searches locally</li>
               </ul>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Cookies
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                WeatherNow uses minimal cookies only for essential
-                functionality, such as remembering your theme preference. We do
-                not use advertising or tracking cookies.
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                Users can clear cookies anytime from browser settings.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Children's Privacy
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                5. Security
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                WeatherNow is safe for all ages. We do not knowingly collect
-                personal information from children under 13.
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                WeatherNow uses HTTPS encryption, backend protection for API keys, and regular vulnerability checks. No system is completely risk free. Report security issues to us immediately.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Changes to This Policy
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                6. Children's Privacy
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                We may update this privacy policy from time to time. Any changes
-                will be posted on this page with an updated revision date.
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                WeatherNow is safe for all ages. We do not knowingly collect data from children under 13.
               </p>
             </section>
 
             <section className="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                Contact Us
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                7. Contact Us
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                If you have questions about this privacy policy or our data
-                practices, please contact us through our website.
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+                For privacy or support inquiries:
+              </p>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                <span className="font-semibold">Email:</span>{" "}
+                <a
+                  href="mailto:harshagrawal070406@gmail.com"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  harshagrawal070406@gmail.com
+                </a>
+              </p>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
+                We respond within 48 hours.
+              </p>
+            </section>
+
+            <section className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                8. Updates to This Policy
+              </h2>
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                If we update this policy, we will notify users on the website.
               </p>
             </section>
           </div>
