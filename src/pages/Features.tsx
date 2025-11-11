@@ -148,9 +148,17 @@ const Features = () => {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
               Powerful Weather Intelligence
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4 mb-6">
               Everything you need to stay informed about the weather
             </p>
+            <div className="max-w-3xl mx-auto px-4">
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                WeatherNow combines advanced meteorological science with user-friendly design to deliver comprehensive weather intelligence. Our platform provides real-time data from global weather networks, processes it through AI algorithms, and presents it in an intuitive interface that anyone can understand.
+              </p>
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                From casual users checking if they need an umbrella to professionals planning outdoor work, WeatherNow delivers the precision and detail you need. Every feature is designed to help you make better decisions based on current and predicted weather conditions.
+              </p>
+            </div>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">

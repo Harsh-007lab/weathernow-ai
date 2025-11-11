@@ -96,6 +96,29 @@ const About = () => {
               curious about the weather, WeatherNow provides the information you
               need in a beautiful, intuitive interface.
             </p>
+            <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+              Our platform processes data from thousands of weather stations, satellites, and atmospheric sensors worldwide. We analyze temperature patterns, precipitation probability, wind dynamics, and atmospheric pressure to provide forecasts you can trust. The integration of machine learning allows us to identify patterns and improve prediction accuracy over time, making each forecast more reliable than the last.
+            </p>
+          </section>
+
+          <section className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+              How WeatherNow Helps You
+            </h2>
+            <div className="space-y-4 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 sm:p-8 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <strong className="text-gray-900 dark:text-white">For Daily Planning:</strong> Know exactly what to wear, whether to bring an umbrella, and how to time your outdoor activities. Our detailed hourly forecasts help you optimize your schedule around weather conditions.
+              </p>
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <strong className="text-gray-900 dark:text-white">For Travel:</strong> Check conditions at your destination before you leave. Multi-day forecasts help you pack appropriately and plan activities that won't be disrupted by weather.
+              </p>
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <strong className="text-gray-900 dark:text-white">For Health & Safety:</strong> UV index warnings protect your skin, humidity levels help manage respiratory conditions, and severe weather alerts keep you safe during storms.
+              </p>
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <strong className="text-gray-900 dark:text-white">For Outdoor Activities:</strong> Wind speed data helps sailors and cyclists, temperature trends guide runners and hikers, and precipitation forecasts ensure your event stays dry.
+              </p>
+            </div>
           </section>
 
           <section className="mb-12 sm:mb-16">

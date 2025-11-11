@@ -27,6 +27,8 @@ import { updateMetaTags, generateWeatherSchema, injectStructuredData } from "@/l
 const WeatherMetrics = lazy(() => import("@/components/WeatherMetrics").then(m => ({ default: m.WeatherMetrics })));
 const ForecastCard = lazy(() => import("@/components/ForecastCard").then(m => ({ default: m.ForecastCard })));
 const WeatherInsights = lazy(() => import("@/components/WeatherInsights").then(m => ({ default: m.WeatherInsights })));
+const WeatherEducation = lazy(() => import("@/components/WeatherEducation").then(m => ({ default: m.WeatherEducation })));
+const KnowledgeSection = lazy(() => import("@/components/KnowledgeSection").then(m => ({ default: m.KnowledgeSection })));
 const AIChat = lazy(() => import("@/components/AIChat").then(m => ({ default: m.AIChat })));
 
 const citySchema = z
@@ -375,6 +377,10 @@ const Index = () => {
               />
             </Suspense>
 
+            <Suspense fallback={<div className="h-40 animate-pulse bg-white/10 rounded-xl" />}>
+              <WeatherEducation data={displayWeatherData} />
+            </Suspense>
+
             {/* Ad before footer */}
             <AdSense 
               className="mt-6 mb-4"
@@ -382,6 +388,13 @@ const Index = () => {
             />
           </motion.main>
         )}
+
+        {/* Knowledge Section - Always visible */}
+        <div className="w-full max-w-4xl mt-8 mb-8">
+          <Suspense fallback={<div className="h-60 animate-pulse bg-white/10 rounded-xl" />}>
+            <KnowledgeSection />
+          </Suspense>
+        </div>
 
         {!displayWeatherData && !isLoading && (
           <>
