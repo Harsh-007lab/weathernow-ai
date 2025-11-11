@@ -11,6 +11,8 @@ import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { Footer } from "@/components/Footer";
 import { FavoritesPanel } from "@/components/FavoritesPanel";
 import { AdSense } from "@/components/AdSense";
+import { WeatherOverview } from "@/components/WeatherOverview";
+import { CookieConsent } from "@/components/CookieConsent";
 
 import { useToast } from "@/hooks/use-toast";
 import { useWeather, useForecast, useWeatherByCoords } from "@/hooks/useWeather";
@@ -356,7 +358,10 @@ const Index = () => {
               <WeatherMetrics data={displayWeatherData} />
             </Suspense>
 
-            {/* Ad below main weather card */}
+            {/* Weather Overview Section */}
+            <WeatherOverview />
+
+            {/* Ad below Weather Overview section */}
             <AdSense 
               className="my-6"
               style={{ minHeight: '120px', maxWidth: '100%' }}
@@ -410,13 +415,6 @@ const Index = () => {
                 conditions with AI-powered insights and 5-day forecasts
               </p>
             </div>
-
-            {/* Banner ad on landing view */}
-            <div className="w-full max-w-2xl mt-6 mx-4">
-              <AdSense 
-                style={{ minHeight: '100px', maxWidth: '100%' }}
-              />
-            </div>
           </>
         )}
       </div>
@@ -424,6 +422,9 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
 
       {/* AI Assistant - Lazy loaded */}
       <Suspense fallback={null}>
