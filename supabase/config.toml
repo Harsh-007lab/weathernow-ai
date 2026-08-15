@@ -1,4 +1,4 @@
-project_id = "oxtpolwqdmwjsvgdjkiw"
+project_id = "oxtpolwqdmwjsvgdjkiw"
 
 [functions.weather-insights]
 verify_jwt = false
