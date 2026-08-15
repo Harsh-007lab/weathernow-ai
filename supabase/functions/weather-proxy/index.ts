@@ -4,8 +4,6 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 // Allowed origins for CORS
 const allowedOrigins = [
   'https://weathernow-ai.vercel.app',
-  /^https:\/\/.*\.lovable\.app$/,
-  /^https:\/\/.*\.lovable\.dev$/,
 ];
 
 const getCorsHeaders = (origin: string | null) => {

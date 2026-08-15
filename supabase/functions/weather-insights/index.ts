@@ -4,8 +4,6 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 // Allowed origins for CORS
 const allowedOrigins = [
   'https://weathernow-ai.vercel.app',
-  /^https:\/\/.*\.lovable\.app$/,
-  /^https:\/\/.*\.lovable\.dev$/,
 ];
 
 const getCorsHeaders = (origin: string | null) => {
@@ -72,10 +70,10 @@ serve(async (req) => {
     // Validate input
     const body = await req.json();
     const { temp, condition, humidity, windSpeed } = WeatherInsightsSchema.parse(body);
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
     const prompt = `Given the weather conditions:
@@ -90,26 +88,21 @@ Provide brief, practical advice (2-3 sentences each) for:
 
 Keep responses concise, friendly, and actionable.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful weather assistant. Provide practical, concise advice about clothing and activities based on weather conditions."
+    // Direct call to Google's Gemini API (no Lovable dependency).
+    // Get a free key at https://aistudio.google.com/apikey
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          systemInstruction: {
+            parts: [{ text: "You are a helpful weather assistant. Provide practical, concise advice about clothing and activities based on weather conditions." }],
           },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
       if (isDev) {
@@ -123,13 +116,6 @@ Keep responses concise, friendly, and actionable.`;
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }),
-          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
 
       return new Response(
         JSON.stringify({ error: 'Unable to generate weather insights. Please try again.' }),
@@ -138,7 +124,10 @@ Keep responses concise, friendly, and actionable.`;
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!aiResponse) {
+      throw new Error("Empty response from AI model");
+    }
 
     // Parse the response to extract outfit and activity suggestions
     const lines = aiResponse.split('\n').filter((line: string) => line.trim());
